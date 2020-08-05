@@ -1,6 +1,8 @@
 # Abune.Server
 ![Abune logo](docs/shfb/icons/logo.png)
+
 **ABUNE** stands for 'Actor Based Udp Network Engine'.
+
 This game server implementation is a based on [Akka.net](https://github.com/akkadotnet/akka.net) and provides a highly scalable actor based runtime primarily for games based on .NET core (https://github.com/dotnet/core))) (like f.e. unity based games).
 
 ## Key features
