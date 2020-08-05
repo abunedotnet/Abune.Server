@@ -3,7 +3,7 @@
 
 **ABUNE** stands for 'Actor Based Udp Network Engine'.
 
-This game server implementation is a based on [Akka.net](https://github.com/akkadotnet/akka.net) and provides a highly scalable actor based runtime primarily for games based on .NET core (https://github.com/dotnet/core))) (like f.e. unity based games).
+This game server implementation is a based on [Akka.net](https://github.com/akkadotnet/akka.net) and provides a highly scalable actor based runtime primarily for games based on [.NET core](https://github.com/dotnet/core) (like f.e. unity based games).
 
 ## Key features
 - **large player count** - linearly scaling of network, cpu and memory with Akka.NET cluster technology
@@ -14,11 +14,11 @@ This game server implementation is a based on [Akka.net](https://github.com/akka
 ## Concept
 
 ### Game system
-![Abune concept](docs/shfb/icons/abune_concept.png)
+![Abune concept](docs/shfb/icons/abune_concept.png =200)
 
 
 ### Infrastructure
-![Abune scaling](docs/shfb/icons/abune_scaling.png)
+![Abune scaling](docs/shfb/icons/abune_scaling.png =400)
 
 
 ### Restrictions
