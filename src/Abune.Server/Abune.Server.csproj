@@ -1,0 +1,114 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyVersion>1.0.1.10</AssemblyVersion>
+    <FileVersion>1.0.1.10</FileVersion>
+	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+  </PropertyGroup>
+  <PropertyGroup>
+   <RuntimeFrameworkVersion>2.1.0</RuntimeFrameworkVersion>
+   <PlatformTarget>AnyCPU</PlatformTarget>
+   <Authors>Thomas Stollenwerk (motmot80)</Authors>
+   <Product>Abune</Product>
+   <Copyright>Copyright (C) 2020 Thomas Stollenwerk (motmot80)</Copyright>
+ </PropertyGroup>
+  <ItemGroup>
+    <None Remove="akkaSettings.AzureStorage.hocon" />
+    <None Remove="Properties\appSettings.json" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <Compile Include="..\Abune.Shared\src\Command\BaseCommand.cs" Link="Command\BaseCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\CommandType.cs" Link="Command\CommandType.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\Contract\ICanAccelerate.cs" Link="Command\Contract\ICanAccelerate.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\Contract\ICanLocate.cs" Link="Command\Contract\ICanLocate.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\Contract\ICanRotate.cs" Link="Command\Contract\ICanRotate.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\ObjectCollisionCommand.cs" Link="Command\ObjectCollisionCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\ObjectCreateCommand.cs" Link="Command\ObjectCreateCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\ObjectDestroyCommand.cs" Link="Command\ObjectDestroyCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\ObjectLockCommand.cs" Link="Command\ObjectLockCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\ObjectUnlockCommand.cs" Link="Command\ObjectUnlockCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\ObjectUpdatePositionCommand.cs" Link="Command\ObjectUpdatePositionCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\ObjectValueRemoveCommand.cs" Link="Command\ObjectValueRemoveCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\ObjectValueUpdateCommand.cs" Link="Command\ObjectValueUpdateCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\SubscribeAreaCommand.cs" Link="Command\SubscribeAreaCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Command\UnsubscribeAreaCommand.cs" Link="Command\UnsubscribeAreaCommand.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\AreaCommandEnvelope.cs" Link="Message\AreaCommandEnvelope.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ClientHelloMessage.cs" Link="Message\ClientHelloMessage.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ClientPingMessage.cs" Link="Message\ClientPingMessage.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ClientPongMessage.cs" Link="Message\ClientPongMessage.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ICanRouteToArea.cs" Link="Message\ICanRouteToArea.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ICanRouteToObject.cs" Link="Message\ICanRouteToObject.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\MessageType.cs" Link="Message\MessageType.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ObjectCommandEnvelope.cs" Link="Message\ObjectCommandEnvelope.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ObjectCommandRequestEnvelope.cs" Link="Message\ObjectCommandRequestEnvelope.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ObjectCommandResponseEnvelope.cs" Link="Message\ObjectCommandResponseEnvelope.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ServerHelloMessage.cs" Link="Message\ServerHelloMessage.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ServerPingMessage.cs" Link="Message\ServerPingMessage.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\ServerPongMessage.cs" Link="Message\ServerPongMessage.cs" />
+    <Compile Include="..\Abune.Shared\src\Message\StartServerMessage.cs" Link="Message\StartServerMessage.cs" />
+    <Compile Include="..\Abune.Shared\src\Protocol\MessageControlFlags.cs" Link="Protocol\MessageControlFlags.cs" />
+    <Compile Include="..\Abune.Shared\src\Protocol\UdpMessage.cs" Link="Protocol\UdpMessage.cs" />
+    <Compile Include="..\Abune.Shared\src\Protocol\UdpTransferFrame.cs" Link="Protocol\UdpTransferFrame.cs" />
+    <Compile Include="..\Abune.Shared\src\Util\Locator.cs" Link="Util\Locator.cs" />
+    <Compile Include="..\Abune.Shared\src\Util\ReliableUdpMessaging.cs" Link="Util\ReliableUdpMessaging.cs" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <Content Include="akkaSettings.AzureStorage.hocon">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Command\Contract\" />
+    <Folder Include="Command\Custom\" />
+    <Folder Include="Message\" />
+    <Folder Include="Docker\" />
+    <Folder Include="Protocol\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+	<AdditionalFiles Include="stylecop.json" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Akka" Version="1.4.8" />
+    <PackageReference Include="Akka.Cluster" Version="1.4.8" />
+    <PackageReference Include="Akka.Cluster.Metrics" Version="1.4.8" />
+    <PackageReference Include="Akka.Cluster.Sharding" Version="1.4.8" />
+    <PackageReference Include="Akka.Persistence" Version="1.4.8" />
+    <PackageReference Include="Akka.Persistence.Azure" Version="0.7.0" />
+    <PackageReference Include="Akka.Serialization.Hyperion" Version="1.4.8" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.7.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0-preview.19074.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0-preview.19074.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview.19074.2" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	 <LangVersion>7.1</LangVersion>
+	 <DefineConstants>TRACE;UDPTRACE</DefineConstants>
+	 <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	 <DocumentationFile>..\..\..\docs\shfb\Abune.Server.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <LangVersion>7.1</LangVersion>
+	  <DefineConstants>TRACE</DefineConstants>
+	</PropertyGroup>  
+</Project>

@@ -1,0 +1,19 @@
+# Azure pipeline
+# Copyright (c) Thomas Stollenwerk (motmot80). All rights reserved.
+
+trigger:
+- main
+
+pool:
+  vmImage: 'microsoft/dotnet'
+
+variables:
+  imageName: 'Abune.Server'
+
+steps:
+- task: Docker@2
+  displayName: Build Abune.Server 
+  inputs:
+    repository: $(imageName)
+    command: build
+    Dockerfile: app/Dockerfile

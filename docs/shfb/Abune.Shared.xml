@@ -1,0 +1,1295 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Abune.Shared</name>
+    </assembly>
+    <members>
+        <member name="T:Abune.Shared.Command.BaseCommand">
+            <summary>
+            Base class for all commands.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.#ctor(System.Byte[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.BaseCommand"/> class.
+            </summary>
+            <param name="buffer">Buffer containing the serialized command.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.#ctor(System.IO.BinaryReader)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.BaseCommand"/> class.
+            </summary>
+            <param name="br">Binary reader on the buffer containing payload.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.#ctor(Abune.Shared.Command.CommandType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.BaseCommand"/> class.
+            </summary>
+            <param name="type">Type of command.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.#ctor(System.Byte,Abune.Shared.Command.CommandType,System.Byte[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.BaseCommand"/> class.
+            </summary>
+            <param name="priority">Command priority.</param>
+            <param name="type">Command type.</param>
+            <param name="commandBody">Body payload of command.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.BaseCommand.Priority">
+            <summary>
+            Gets the command priority.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.BaseCommand.Type">
+            <summary>
+            Gets the command type.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.BaseCommand.Body">
+            <summary>
+            Gets or sets the command payload.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.Serialize">
+            <summary>
+            Serializes this instance.
+            </summary>
+            <returns>Serialized instance.</returns>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.Serialize(System.IO.BinaryWriter)">
+            <summary>
+            Serializes this instance into a binary writer.
+            </summary>
+            <param name="bw">Binary write to serialize to.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.Deserialize(System.Byte[])">
+            <summary>
+            Deserializes the buffer into this instance.
+            </summary>
+            <param name="buffer">Byte buffer.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.Deserialize(System.IO.BinaryReader)">
+            <summary>
+            Deserializes the binary reader into this instance.
+            </summary>
+            <param name="br">Binary reader on byte buffer.</param>
+        </member>
+        <member name="T:Abune.Shared.Command.CommandType">
+            <summary>
+            Different command types.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.ObjectUpdatePosition">
+            <summary>
+            Updates object position.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.ObjectCreate">
+            <summary>
+            Creates an object.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.ObjectDestroy">
+            <summary>
+            Destroys an object.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.SubscribeArea">
+            <summary>
+            Subscribes client to an area.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.UnsubscribeArea">
+            <summary>
+            Unsubscribes client from an area.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.ObjectLock">
+            <summary>
+            Requests to lock an object.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.ObjectUnlock">
+            <summary>
+            Requests to unlock an object.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.ObjectValueUpdate">
+            <summary>
+            Updates or creates an object value.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.ObjectValueRemove">
+            <summary>
+            Deletes an object value.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.ObjectCollision">
+            <summary>
+            Object is colliding with object.
+            </summary>
+            <remarks>
+            For future use.
+            </remarks>
+        </member>
+        <member name="T:Abune.Shared.Command.Contract.ICanAccelerate">
+            <summary>
+            Interface for things that could accelerate.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.VelocityX">
+            <summary>
+            Gets the velocity on x axis in units per second.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.VelocityY">
+            <summary>
+            Gets the velocity on y axis in units per second.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.VelocityZ">
+            <summary>
+            Gets the velocity on z axis in units per second.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.AngularVelocityX">
+            <summary>
+            Gets the angular velocity on x axis in radiants per second.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.AngularVelocityY">
+            <summary>
+            Gets the angular velocity on x axis in radiants per second.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.AngularVelocityZ">
+            <summary>
+            Gets the angular velocity on x axis in radiants per second.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Command.Contract.ICanLocate">
+            <summary>
+            Interface for things that can be located.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanLocate.WorldPositionX">
+            <summary>
+            Gets the world position x axis.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanLocate.WorldPositionY">
+            <summary>
+            Gets the world position y axis.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanLocate.WorldPositionZ">
+            <summary>
+            Gets the world position z axis.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Command.Contract.ICanRotate">
+            <summary>Implementation can rotate (Quaternion).</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanRotate.RotationW">
+            <summary>Gets the rotation w.</summary>
+            <value>The rotation w.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanRotate.RotationX">
+            <summary>Gets the rotation x.</summary>
+            <value>The rotation x.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanRotate.RotationY">
+            <summary>Gets the rotation y.</summary>
+            <value>The rotation y.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.ICanRotate.RotationZ">
+            <summary>Gets the rotation z.</summary>
+            <value>The rotation z.</value>
+        </member>
+        <member name="T:Abune.Shared.Command.ObjectCollisionCommand">
+            <summary>
+            Object collision command.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectCollisionCommand.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCollisionCommand"/> class.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectCollisionCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCollisionCommand"/> class.
+            </summary>
+            <param name="command">Unextracted base command.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectCollisionCommand.#ctor(System.UInt64,System.UInt64,System.Single,System.Single,System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCollisionCommand"/> class.
+            </summary>
+            <param name="objectIdColliding">Id of object colliding.</param>
+            <param name="frameTick">Tick of the frame.</param>
+            <param name="impulseX">Impulse on x axis in units per second.</param>
+            <param name="impulseY">Impulse on y axis in units per second.</param>
+            <param name="impulseZ">Impulse on z axis in units per second.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.ObjectIdColliding">
+            <summary>
+            Gets or sets the id of the colliding object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.FrameTick">
+            <summary>
+            Gets or sets the tick of the frame.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.ImpulseX">
+            <summary>
+            Gets or sets impulse x axis in units per second.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.ImpulseY">
+            <summary>
+            Gets or sets impulse y axis in units per second.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.ImpulseZ">
+            <summary>
+            Gets or sets impulse z axis in units per second.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Command.ObjectCreateCommand">
+            <summary>
+            Object create command.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectCreateCommand.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCreateCommand"/> class.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectCreateCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCreateCommand"/> class.
+            </summary>
+            <param name="command">Unextracted base command.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectCreateCommand.#ctor(System.UInt64,System.UInt64,System.UInt64,System.UInt32,System.UInt32,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCreateCommand"/> class.
+            </summary>
+            <param name="frameTick">Frame tick when the object was created.</param>
+            <param name="objectId">Id of the new object.</param>
+            <param name="parentObjectId">Id of the objects parent.</param>
+            <param name="ownerId">Id of the owner.</param>
+            <param name="typeId">Type of the object.</param>
+            <param name="targetPositionX">Position x where object is located.</param>
+            <param name="targetPositionY">Position y where object is located.</param>
+            <param name="targetPositionZ">Position z where object is located.</param>
+            <param name="quaternionW">Quaternion direction w axis of object.</param>
+            <param name="quaternionX">Quaternion direction x axis of object.</param>
+            <param name="quaternionY">Quaternion direction y axis of object.</param>
+            <param name="quaternionZ">Quaternion direction z axis of object.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.FrameTick">
+            <summary>
+            Gets or sets frame tick when the object was created.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.ObjectId">
+            <summary>
+            Gets or sets id of the new object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.ParentObjectId">
+            <summary>
+            Gets or sets id of the objects parent.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.OwnerId">
+            <summary>
+            Gets or sets id of the owner.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TypeId">
+            <summary>
+            Gets or sets type of the object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TargetPositionX">
+            <summary>
+            Gets or sets position x where object is located.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TargetPositionY">
+            <summary>
+            Gets or sets position y where object is located.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TargetPositionZ">
+            <summary>
+            Gets or sets position z where object is located.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.QuaternionW">
+            <summary>
+            Gets or sets quaternion direction w axis of object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.QuaternionX">
+            <summary>
+            Gets or sets quaternion direction x axis of object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.QuaternionY">
+            <summary>
+            Gets or sets quaternion direction y axis of object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.QuaternionZ">
+            <summary>
+            Gets or sets quaternion direction z axis of object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionX">
+            <summary>
+            Gets position x where object is located.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionY">
+            <summary>
+            Gets position x where object is located.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionZ">
+            <summary>
+            Gets position x where object is located.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#RotationW">
+            <summary>
+            Gets quaternion direction w axis of object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#RotationX">
+            <summary>
+            Gets quaternion direction x axis of object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#RotationY">
+            <summary>
+            Gets quaternion direction y axis of object.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#RotationZ">
+            <summary>
+            Gets quaternion direction z axis of object.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Command.ObjectDestroyCommand">
+            <summary>
+            Command class for object destruction.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectDestroyCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectDestroyCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectDestroyCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectDestroyCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command argument.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectDestroyCommand.#ctor(System.UInt64,System.UInt64,System.Single,System.Single,System.Single)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectDestroyCommand" /> class.</summary>
+            <param name="frameTick">The frame tick.</param>
+            <param name="objectId">The object identifier.</param>
+            <param name="targetPositionX">The target position x.</param>
+            <param name="targetPositionY">The target position y.</param>
+            <param name="targetPositionZ">The target position z.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.FrameTick">
+            <summary>Gets or sets the frame tick.</summary>
+            <value>The frame tick.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.ObjectId">
+            <summary>Gets or sets the object identifier.</summary>
+            <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.TargetPositionX">
+            <summary>Gets or sets the target position x.</summary>
+            <value>The target position x.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.TargetPositionY">
+            <summary>Gets or sets the target position y.</summary>
+            <value>The target position y.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.TargetPositionZ">
+            <summary>Gets or sets the target position z.</summary>
+            <value>The target position z.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.WorldPositionX">
+            <summary>Gets the world position x axis.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.WorldPositionY">
+            <summary>Gets the world position y axis.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.WorldPositionZ">
+            <summary>Gets the world position z axis.</summary>
+        </member>
+        <member name="T:Abune.Shared.Command.ObjectLockCommand">
+            <summary>Command to lock objects.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectLockCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectLockCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectLockCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectLockCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectLockCommand.#ctor(System.UInt64,System.UInt32,System.TimeSpan)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectLockCommand" /> class.</summary>
+            <param name="objectId">The object identifier.</param>
+            <param name="lockOwnerId">The lock owner identifier.</param>
+            <param name="timeout">The timeout.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectLockCommand.ObjectId">
+            <summary>
+            Gets or sets the object identifier.
+            </summary>
+            <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectLockCommand.LockOwnerId">
+            <summary>Gets or sets the lock owner identifier.</summary>
+            <value>The lock owner identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectLockCommand.Timeout">
+            <summary>Gets or sets the timeout.</summary>
+            <value>The timeout.</value>
+        </member>
+        <member name="T:Abune.Shared.Command.ObjectUnlockCommand">
+            <summary>Unlock an object.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectUnlockCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUnlockCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectUnlockCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUnlockCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectUnlockCommand.#ctor(System.UInt64,System.UInt32)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUnlockCommand" /> class.</summary>
+            <param name="objectId">The object identifier.</param>
+            <param name="lockOwnerId">The lock owner identifier.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUnlockCommand.ObjectId">
+            <summary>Gets or sets the object identifier.</summary>
+            <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUnlockCommand.LockOwnerId">
+            <summary>Gets or sets the lock owner identifier.</summary>
+            <value>The lock owner identifier.</value>
+        </member>
+        <member name="T:Abune.Shared.Command.ObjectUpdatePositionCommand">
+            <summary>Update object position.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUpdatePositionCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUpdatePositionCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.UInt64,System.UInt64)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUpdatePositionCommand" /> class.</summary>
+            <param name="targetPositionX">The target position x.</param>
+            <param name="targetPositionY">The target position y.</param>
+            <param name="targetPositionZ">The target position z.</param>
+            <param name="quaternionW">The quaternion w.</param>
+            <param name="quaternionX">The quaternion x.</param>
+            <param name="quaternionY">The quaternion y.</param>
+            <param name="quaternionZ">The quaternion z.</param>
+            <param name="startFrameTick">The start frame tick.</param>
+            <param name="stopFrameTick">The stop frame tick.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.UInt64,System.UInt64)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUpdatePositionCommand" /> class.</summary>
+            <param name="targetPositionX">The target position x.</param>
+            <param name="targetPositionY">The target position y.</param>
+            <param name="targetPositionZ">The target position z.</param>
+            <param name="quaternionW">The quaternion w.</param>
+            <param name="quaternionX">The quaternion x.</param>
+            <param name="quaternionY">The quaternion y.</param>
+            <param name="quaternionZ">The quaternion z.</param>
+            <param name="velocityX">The velocity x.</param>
+            <param name="velocityY">The velocity y.</param>
+            <param name="velocityZ">The velocity z.</param>
+            <param name="angularVelocityX">The angular velocity x.</param>
+            <param name="angularVelocityY">The angular velocity y.</param>
+            <param name="angularVelocityZ">The angular velocity z.</param>
+            <param name="startFrameTick">The start frame tick.</param>
+            <param name="stopFrameTick">The stop frame tick.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetPositionX">
+            <summary>Gets or sets the target position x.</summary>
+            <value>The target position x.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetPositionY">
+            <summary>
+            Gets or sets the target position y.
+            </summary>
+            <value>The target position y.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetPositionZ">
+            <summary>Gets or sets the target position z.</summary>
+            <value>The target position z.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.QuaternionW">
+            <summary>Gets or sets the quaternion w.</summary>
+            <value>The quaternion w.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.QuaternionX">
+            <summary>Gets or sets the quaternion x.</summary>
+            <value>The quaternion x.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.QuaternionY">
+            <summary>Gets or sets the quaternion y.</summary>
+            <value>The quaternion y.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.QuaternionZ">
+            <summary>Gets or sets the quaternion z.</summary>
+            <value>The quaternion z.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.VelocityX">
+            <summary>Gets or sets the velocity x.</summary>
+            <value>The velocity x.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.VelocityY">
+            <summary>Gets or sets the velocity y.</summary>
+            <value>The velocity y.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.VelocityZ">
+            <summary>Gets or sets the velocity z.</summary>
+            <value>The velocity z.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.AngularVelocityX">
+            <summary>Gets or sets the angular velocity x.</summary>
+            <value>The angular velocity x.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.AngularVelocityY">
+            <summary>Gets or sets the angular velocity y.</summary>
+            <value>The angular velocity y.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.AngularVelocityZ">
+            <summary>Gets or sets the angular velocity z.</summary>
+            <value>The angular velocity z.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.StartFrameTick">
+            <summary>Gets or sets the start frame tick.</summary>
+            <value>The start frame tick.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.StopFrameTick">
+            <summary>Gets or sets the stop frame tick.</summary>
+            <value>The stop frame tick.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionX">
+            <summary>Gets the world position x axis.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionY">
+            <summary>Gets the world position y axis.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionZ">
+            <summary>
+            Gets the world position z axis.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#RotationW">
+            <summary>Gets the rotation w.</summary>
+            <value>The rotation w.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#RotationX">
+            <summary>Gets the rotation x.</summary>
+            <value>The rotation x.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#RotationY">
+            <summary>Gets the rotation y.</summary>
+            <value>The rotation y.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#RotationZ">
+            <summary>Gets the rotation z.</summary>
+            <value>The rotation z.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#VelocityX">
+            <summary>Gets the velocity on x axis in units per second.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#VelocityY">
+            <summary>Gets the velocity on y axis in units per second.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#VelocityZ">
+            <summary>Gets the velocity on z axis in units per second.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#AngularVelocityX">
+            <summary>Gets the angular velocity on x axis in radiants per second.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#AngularVelocityY">
+            <summary>Gets the angular velocity on x axis in radiants per second.</summary>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#AngularVelocityZ">
+            <summary>Gets the angular velocity on x axis in radiants per second.</summary>
+        </member>
+        <member name="T:Abune.Shared.Command.ObjectValueRemoveCommand">
+            <summary>Remove value from object command.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectValueRemoveCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectValueRemoveCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectValueRemoveCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectValueRemoveCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectValueRemoveCommand.#ctor(System.UInt64,System.UInt32)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectValueRemoveCommand" /> class.</summary>
+            <param name="objectId">The object identifier.</param>
+            <param name="valueId">The value identifier.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectValueRemoveCommand.ObjectId">
+            <summary>Gets or sets the object identifier.</summary>
+            <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectValueRemoveCommand.ValueId">
+            <summary>Gets or sets the value identifier.</summary>
+            <value>The value identifier.</value>
+        </member>
+        <member name="T:Abune.Shared.Command.ObjectValueUpdateCommand">
+            <summary>Update value of object command.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectValueUpdateCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectValueUpdateCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectValueUpdateCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectValueUpdateCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.ObjectValueUpdateCommand.#ctor(System.UInt64,System.UInt32,System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectValueUpdateCommand" /> class.</summary>
+            <param name="objectId">The object identifier.</param>
+            <param name="valueId">The value identifier.</param>
+            <param name="data">The data.</param>
+            <exception cref="T:System.ArgumentNullException">Data is null.</exception>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectValueUpdateCommand.ObjectId">
+            <summary>Gets or sets the object identifier.</summary>
+            <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectValueUpdateCommand.ValueId">
+            <summary>Gets or sets the value identifier.</summary>
+            <value>The value identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectValueUpdateCommand.Data">
+            <summary>Gets or sets the data.</summary>
+            <value>The data.</value>
+        </member>
+        <member name="T:Abune.Shared.Command.SubscribeAreaCommand">
+            <summary>Subscribe client to area command.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.SubscribeAreaCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.SubscribeAreaCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.SubscribeAreaCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.SubscribeAreaCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.SubscribeAreaCommand.#ctor(System.UInt32,System.UInt64,System.UInt16)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.SubscribeAreaCommand" /> class.</summary>
+            <param name="clientId">The client identifier.</param>
+            <param name="areaId">The area identifier.</param>
+            <param name="messagePriority">The message priority.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.SubscribeAreaCommand.ClientId">
+            <summary>Gets the client identifier.</summary>
+            <value>The client identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.SubscribeAreaCommand.AreaId">
+            <summary>Gets the area identifier.</summary>
+            <value>The area identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.SubscribeAreaCommand.MessagePriority">
+            <summary>Gets the message priority.</summary>
+            <value>The message priority.</value>
+        </member>
+        <member name="M:Abune.Shared.Command.SubscribeAreaCommand.ToString">
+            <summary>Converts to string.</summary>
+            <returns>A <see cref="T:System.String" /> that represents this instance.</returns>
+        </member>
+        <member name="T:Abune.Shared.Command.UnsubscribeAreaCommand">
+            <summary>Unsubscribe client from area command.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.UnsubscribeAreaCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.UnsubscribeAreaCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.UnsubscribeAreaCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.UnsubscribeAreaCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.UnsubscribeAreaCommand.#ctor(System.UInt32,System.UInt64)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.UnsubscribeAreaCommand" /> class.</summary>
+            <param name="clientId">The client identifier.</param>
+            <param name="areaId">The area identifier.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.UnsubscribeAreaCommand.ClientId">
+            <summary>Gets the client identifier.</summary>
+            <value>The client identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.UnsubscribeAreaCommand.AreaId">
+            <summary>Gets the area identifier.</summary>
+            <value>The area identifier.</value>
+        </member>
+        <member name="T:Abune.Shared.Message.AreaCommandEnvelope">
+            <summary>Envelope for area commands.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.AreaCommandEnvelope.#ctor(System.UInt64,Abune.Shared.Message.ObjectCommandEnvelope)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.AreaCommandEnvelope" /> class.</summary>
+            <param name="toAreaId">To area identifier.</param>
+            <param name="objectCommandEnvelope">The object command envelope.</param>
+        </member>
+        <member name="M:Abune.Shared.Message.AreaCommandEnvelope.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.AreaCommandEnvelope" /> class.</summary>
+            <param name="data">The data.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.AreaCommandEnvelope.ToAreaId">
+            <summary>Gets the area identifier to route to.</summary>
+            <value>Area identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.AreaCommandEnvelope.ObjectCommandEnvelope">
+            <summary>Gets the object command envelope.</summary>
+            <value>The object command envelope.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.AreaCommandEnvelope.ToObjectId">
+            <summary>  Gets the object identifier to route to.</summary>
+            <value>Object identifier.</value>
+        </member>
+        <member name="T:Abune.Shared.Message.ClientHelloMessage">
+            <summary>Client hello message.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientHelloMessage.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ClientHelloMessage" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientHelloMessage.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ClientHelloMessage" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientHelloMessage.ClientId">
+            <summary>
+             Gets or sets the client identifier.
+            </summary>
+            <value>The client identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientHelloMessage.ClientPort">
+            <summary>Gets or sets the client udp port.</summary>
+            <value>The client port.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientHelloMessage.Message">
+            <summary>Gets or sets the message.</summary>
+            <value>The message.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientHelloMessage.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
+        <member name="T:Abune.Shared.Message.ClientPingMessage">
+            <summary>Client ping request message.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientPingMessage.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ClientPingMessage" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientPingMessage.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ClientPingMessage" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientPingMessage.ClientTimestamp">
+            <summary>Gets or sets the client timestamp.</summary>
+            <value>The client timestamp.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientPingMessage.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
+        <member name="T:Abune.Shared.Message.ClientPongMessage">
+            <summary>Client pong response message.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientPongMessage.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ClientPongMessage" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientPongMessage.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ClientPongMessage" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientPongMessage.ServerRequestTimestamp">
+            <summary>Gets or sets the server request timestamp.</summary>
+            <value>The server request timestamp.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientPongMessage.ClientRequestTimestamp">
+            <summary>Gets or sets the client request timestamp.</summary>
+            <value>The client request timestamp.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientPongMessage.ClientResponseTimestamp">
+            <summary>Gets or sets the client response timestamp.</summary>
+            <value>The client response timestamp.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientPongMessage.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
+        <member name="T:Abune.Shared.Message.ICanRouteToArea">
+            <summary>Implementation can be reached by area id.</summary>
+        </member>
+        <member name="P:Abune.Shared.Message.ICanRouteToArea.ToAreaId">
+            <summary>Gets the area identifier.</summary>
+            <value>Area identifier.</value>
+        </member>
+        <member name="T:Abune.Shared.Message.ICanRouteToObject">
+            <summary>Implementation can be reached by object id.</summary>
+        </member>
+        <member name="P:Abune.Shared.Message.ICanRouteToObject.ToObjectId">
+            <summary>Gets the object identifier.</summary>
+            <value>Object identifier.</value>
+        </member>
+        <member name="T:Abune.Shared.Message.FrameType">
+            <summary>Enumeration for frame types.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.Start">
+            <summary>First start frame.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.ClientHello">
+            <summary>Client hello frame.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.ServerHello">
+            <summary>Server hello frame.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.ClientPing">
+            <summary>Client ping request.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.ServerPong">
+            <summary>Server pong response.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.ServerPing">
+            <summary>Server ping request.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.ClientPong">
+            <summary>Client pong response.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.Message">
+            <summary>Containing message with commands.</summary>
+        </member>
+        <member name="T:Abune.Shared.Message.ObjectCommandEnvelope">
+            <summary>Transport envelope for object commands.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ObjectCommandEnvelope.#ctor(System.UInt32,Abune.Shared.Command.BaseCommand,System.UInt64)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ObjectCommandEnvelope" /> class.</summary>
+            <param name="senderId">The sender identifier.</param>
+            <param name="command">The command.</param>
+            <param name="toObjectId">To object identifier.</param>
+        </member>
+        <member name="M:Abune.Shared.Message.ObjectCommandEnvelope.#ctor(Abune.Shared.Protocol.UdpMessage)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ObjectCommandEnvelope" /> class.</summary>
+            <param name="message">The message.</param>
+            <exception cref="T:System.ArgumentNullException">Message is null.</exception>
+        </member>
+        <member name="P:Abune.Shared.Message.ObjectCommandEnvelope.SenderId">
+            <summary>
+             Gets the sender identifier.
+            </summary>
+            <value>The sender identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ObjectCommandEnvelope.ToObjectId">
+            <summary>Gets the target object identifier.</summary>
+            <value>Object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ObjectCommandEnvelope.Command">
+            <summary>Gets the command.</summary>
+            <value>The command.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ObjectCommandEnvelope.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
+        <member name="T:Abune.Shared.Message.ObjectCommandRequestEnvelope">
+            <summary>Transport envolope for request envelopes.</summary>
+            <seealso cref="T:Abune.Shared.Message.ObjectCommandEnvelope"/>
+        </member>
+        <member name="M:Abune.Shared.Message.ObjectCommandRequestEnvelope.#ctor(Abune.Shared.Message.ObjectCommandEnvelope)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ObjectCommandRequestEnvelope" /> class.</summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ObjectCommandRequestEnvelope.Message">
+            <summary>
+              <para>
+            Gets the message.
+            </para>
+            </summary>
+            <value>The message.</value>
+        </member>
+        <member name="T:Abune.Shared.Message.ObjectCommandResponseEnvelope">
+            <summary>Transport envolope for response envelopes.</summary>
+            <seealso cref="T:Abune.Shared.Message.ObjectCommandEnvelope"/>
+        </member>
+        <member name="M:Abune.Shared.Message.ObjectCommandResponseEnvelope.#ctor(Abune.Shared.Message.ObjectCommandEnvelope)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ObjectCommandResponseEnvelope" /> class.</summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ObjectCommandResponseEnvelope.Message">
+            <summary>Gets the message.</summary>
+            <value>The message.</value>
+        </member>
+        <member name="T:Abune.Shared.Message.ServerHelloMessage">
+            <summary>Server welcome message.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerHelloMessage.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ServerHelloMessage" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerHelloMessage.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ServerHelloMessage" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ServerHelloMessage.Message">
+            <summary>Gets or sets the welcome message.</summary>
+            <value>The message.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerHelloMessage.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
+        <member name="T:Abune.Shared.Message.ServerPingMessage">
+            <summary>Message for server ping.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerPingMessage.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ServerPingMessage" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerPingMessage.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ServerPingMessage" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ServerPingMessage.ServerTimestamp">
+            <summary>Gets or sets the server timestamp.</summary>
+            <value>The server timestamp.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerPingMessage.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
+        <member name="T:Abune.Shared.Message.ServerPongMessage">
+            <summary>Server pong message.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerPongMessage.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ServerPongMessage" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerPongMessage.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ServerPongMessage" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ServerPongMessage.ClientRequestTimestamp">
+            <summary>Gets or sets the client request timestamp.</summary>
+            <value>The client request timestamp.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ServerPongMessage.ClientResponseTimestamp">
+            <summary>Gets or sets the client response timestamp.</summary>
+            <value>The client response timestamp.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ServerPongMessage.ServerTimestamp">
+            <summary>Gets or sets the server timestamp.</summary>
+            <value>The server timestamp.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerPongMessage.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
+        <member name="T:Abune.Shared.Message.StartServerMessage">
+            <summary>Server start message.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.StartServerMessage.#ctor(System.Net.IPEndPoint)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.StartServerMessage" /> class.</summary>
+            <param name="serverEndpoint">The server endpoint.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.StartServerMessage.ServerEndpoint">
+            <summary>Gets the server endpoint.</summary>
+            <value>The server endpoint.</value>
+        </member>
+        <member name="T:Abune.Shared.Protocol.MessageControlFlags">
+            <summary>Control flags for message header.</summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.NOOP">
+            <summary>
+            No Operation - ‭‬0b0000_0000
+            followed by [].
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.ACK">
+            <summary>
+            Acknowledge (QoS 1) - 0b0000_0001
+            followed by [ACK-MESSAGEID] [...].
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.ACK2">
+            <summary>
+            Acknowledge Response (QoS 2) - 0b0000_0011
+             [...] followed by [ACK-ACK-MESSAGEID] [...].
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.NACK">
+            <summary>
+            Negative Acknoledgment (Qos 1, 2) - 0b0000_0100
+            [...] followed by [NACK-MESSAGEID] [...].
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.REJ">
+            <summary>
+            Reject / Drop (Qos 1, 2) - 0b0000_1100
+            [...] followed by [NACK-MESSAGEID] [...].
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.QOS0">
+            <summary>
+            Quality of service "none" - 0b0000_0000
+            [...] followed by [PAYLOAD].
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.QOS1">
+            <summary>
+            Quality of service "at least once" - 0b0001_0000
+            [...] followed by [PAYLOAD].
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.QOS2">
+            <summary>
+            Quality of service "exactly once" - 0b0011_0000
+            [...] followed by [PAYLOAD].
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Protocol.MessageControlFlags.COMMAND">
+            <summary>
+            Message with command - 0b1000_0000
+            followed by [...] [PAYLOAD].
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Protocol.UdpMessage">
+            <summary>Udp layer message transporting frames and command messages.</summary>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpMessage.#ctor(System.UInt32,Abune.Shared.Protocol.MessageControlFlags,System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Protocol.UdpMessage" /> class.</summary>
+            <param name="sequenceId">The sequence identifier.</param>
+            <param name="controlFlags">The control flags.</param>
+            <param name="commandBody">The command body.</param>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpMessage.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Protocol.UdpMessage" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpMessage.#ctor(System.IO.BinaryReader)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Protocol.UdpMessage" /> class.</summary>
+            <param name="br">The br.</param>
+        </member>
+        <member name="P:Abune.Shared.Protocol.UdpMessage.SequenceId">
+            <summary>Gets or sets the sequence identifier.</summary>
+            <value>The sequence identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Protocol.UdpMessage.ControlFlags">
+            <summary>Gets or sets the control flags.</summary>
+            <value>The control flags.</value>
+        </member>
+        <member name="P:Abune.Shared.Protocol.UdpMessage.CommandBody">
+            <summary>Gets or sets the command body.</summary>
+            <value>The command body.</value>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpMessage.Deserialize(System.Byte[])">
+            <summary>Deserializes the specified buffer.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpMessage.Deserialize(System.IO.BinaryReader)">
+            <summary>Deserializes the specified br.</summary>
+            <param name="br">The br.</param>
+            <exception cref="T:System.ArgumentNullException">Binary reader is null.</exception>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpMessage.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized udp message.</returns>
+        </member>
+        <member name="T:Abune.Shared.Protocol.UdpTransferFrame">
+            <summary>Transfer frame udp frame.</summary>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpTransferFrame.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Protocol.UdpTransferFrame" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpTransferFrame.#ctor(Abune.Shared.Message.FrameType,System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Protocol.UdpTransferFrame" /> class.</summary>
+            <param name="type">The type.</param>
+            <param name="messageBuffer">The message buffer.</param>
+            <exception cref="T:System.ArgumentNullException">MessageBuffer is null.</exception>
+        </member>
+        <member name="P:Abune.Shared.Protocol.UdpTransferFrame.Type">
+            <summary>Gets or sets the type.</summary>
+            <value>The type.</value>
+        </member>
+        <member name="P:Abune.Shared.Protocol.UdpTransferFrame.Length">
+            <summary>Gets or sets the length.</summary>
+            <value>The length.</value>
+        </member>
+        <member name="P:Abune.Shared.Protocol.UdpTransferFrame.MessageBuffer">
+            <summary>Gets or sets the message buffer.</summary>
+            <value>The message buffer.</value>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpTransferFrame.Deserialize(System.Byte[])">
+            <summary>Deserializes the specified buffer.</summary>
+            <param name="buffer">The buffer.</param>
+            <exception cref="T:System.IO.InternalBufferOverflowException">Invalid message size: {this.Length}.</exception>
+            <exception cref="T:System.InvalidOperationException">Invalid control byte: {controlByte}.</exception>
+        </member>
+        <member name="M:Abune.Shared.Protocol.UdpTransferFrame.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized buffer.</returns>
+        </member>
+        <member name="T:Abune.Shared.Util.Locator">
+            <summary>Implementation to locate areas and objects.</summary>
+        </member>
+        <member name="F:Abune.Shared.Util.Locator.AREASIZE">
+            <summary>  The dimension (size) of one area.</summary>
+        </member>
+        <member name="F:Abune.Shared.Util.Locator.MAXAREASIZE">
+            <summary>The world size.</summary>
+        </member>
+        <member name="F:Abune.Shared.Util.Locator.MAXPOSITION">
+            <summary>  The absolute maximum position an object can have.</summary>
+        </member>
+        <member name="M:Abune.Shared.Util.Locator.GetAreaIdFromWorldPosition(System.Single,System.Single,System.Single)">
+            <summary>Gets the area identifier from world position.</summary>
+            <param name="x">The x position.</param>
+            <param name="y">The y position.</param>
+            <param name="z">The z position.</param>
+            <returns>The area identifier.</returns>
+        </member>
+        <member name="M:Abune.Shared.Util.Locator.GetAreaIdsWithinWorldBoundaries(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+            <summary>Gets all area identifiers within the given world boundaries.</summary>
+            <param name="minX">The minimum x position.</param>
+            <param name="minY">The minimum y position.</param>
+            <param name="minZ">The minimum z position.</param>
+            <param name="maxX">The maximum x position.</param>
+            <param name="maxY">The maximum y position.</param>
+            <param name="maxZ">The maximum z position.</param>
+            <returns>List of area identifiers.</returns>
+        </member>
+        <member name="M:Abune.Shared.Util.Locator.GetAreaBoundary(System.UInt64,System.Single@,System.Single@,System.Single@,System.Single@,System.Single@,System.Single@)">
+            <summary>Gets the boundary of the area.</summary>
+            <param name="areaId">The area identifier.</param>
+            <param name="minX">The minimum x boundary.</param>
+            <param name="minY">The minimum y boundary.</param>
+            <param name="minZ">The minimum z boundary.</param>
+            <param name="maxX">The maximum x boundary.</param>
+            <param name="maxY">The maximum y boundary.</param>
+            <param name="maxZ">The maximum z boundary.</param>
+        </member>
+        <member name="T:Abune.Shared.Util.ReliableUdpMessaging">
+            <summary>Reliable udp messaging supporting QoS 0, 1 and 2.</summary>
+        </member>
+        <member name="M:Abune.Shared.Util.ReliableUdpMessaging.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Util.ReliableUdpMessaging" /> class.</summary>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.MessageReceivedCount">
+            <summary>Gets the message received count.</summary>
+            <value>The message received count.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.MessageSentCount">
+            <summary>Gets the message sent count.</summary>
+            <value>The message sent count.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.DeadletterCount">
+            <summary>Gets the deadletter count.</summary>
+            <value>The deadletter count.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.MessageResentCount">
+            <summary>Gets the message resent count.</summary>
+            <value>The message resent count.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.MessageUnackedCount">
+            <summary>Gets the message unacked count.</summary>
+            <value>The message unacked count.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.MTU">
+            <summary>Gets or sets the mtu.</summary>
+            <value>The mtu.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.RateLimit">
+            <summary>Gets or sets the rate limit.</summary>
+            <value>The rate limit.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.OnProcessCommandMessage">
+            <summary>Gets or sets the callback method to process an incoming message.</summary>
+            <value>The callback handler.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.OnSendFrame">
+            <summary>Gets or sets the callback method to send a udp frame.</summary>
+            <value>The callback handler.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.OnDeadLetter">
+            <summary>Gets or sets the callback method for dead lettered messages.</summary>
+            <value>The callback handler.</value>
+        </member>
+        <member name="M:Abune.Shared.Util.ReliableUdpMessaging.ProcessMessageFrame(Abune.Shared.Protocol.UdpTransferFrame)">
+            <summary>Processes the message frame.</summary>
+            <param name="frame">The frame.</param>
+            <exception cref="T:System.ArgumentNullException">Frame is null.</exception>
+        </member>
+        <member name="M:Abune.Shared.Util.ReliableUdpMessaging.SendCommand(System.UInt32,Abune.Shared.Command.BaseCommand,System.UInt64,Abune.Shared.Protocol.MessageControlFlags)">
+            <summary>Sends a command.</summary>
+            <param name="senderId">The sender identifier.</param>
+            <param name="command">The command.</param>
+            <param name="toObjectId">To object identifier.</param>
+            <param name="qualityOfService">The quality of service.</param>
+        </member>
+        <member name="M:Abune.Shared.Util.ReliableUdpMessaging.SendCommandEnvelope(Abune.Shared.Message.ObjectCommandEnvelope,Abune.Shared.Protocol.MessageControlFlags)">
+            <summary>Sends a command envelope.</summary>
+            <param name="commandEnvelope">The command envelope.</param>
+            <param name="qualityOfService">The quality of service.</param>
+            <exception cref="T:System.ArgumentNullException">commandEnvelope is null.</exception>
+        </member>
+        <member name="M:Abune.Shared.Util.ReliableUdpMessaging.GetMessageWaitTime">
+            <summary>Gets the message wait time.</summary>
+            <returns>The time to wait.</returns>
+        </member>
+        <member name="M:Abune.Shared.Util.ReliableUdpMessaging.IsSendRateExceeded">
+            <summary>Determines whether [is send rate exceeded].</summary>
+            <returns>
+              <c>true</c> if [is send rate exceeded]; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Abune.Shared.Util.ReliableUdpMessaging.SynchronizeMessages">
+            <summary>Synchronizes all pending messages between local and remote.</summary>
+            <returns>
+            Suggested wait time. For example when send rate is exceeded.
+            </returns>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.MessageEntry.LastSendTimeStamp">
+            <summary>Gets or sets the last send time stamp.</summary>
+            <value>The last send time stamp.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.MessageEntry.SendCount">
+            <summary>Gets or sets the send count.</summary>
+            <value>The send count.</value>
+        </member>
+        <member name="P:Abune.Shared.Util.ReliableUdpMessaging.MessageEntry.Message">
+            <summary>Gets or sets the message.</summary>
+            <value>The message.</value>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "UdpAkkaServer": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Executable",
+      "executablePath": "docker",
+      "commandLineArgs": "run -it -p 127.0.0.1:7777:7777/udp -p 127.0.0.1:7778:7778/tcp udpakkaserver"
+    }
+  }
+}

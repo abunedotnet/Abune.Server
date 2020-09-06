@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Abune.Server.Cli</name>
+    </assembly>
+    <members>
+        <member name="T:Abune.Server.Cli.CliClient">
+            <summary>
+            Abune CLI client.
+            </summary>
+        </member>
+        <member name="P:Abune.Server.Cli.CliClient.ClientId">
+            <summary>Gets or sets the client identifier.</summary>
+            <value>The client identifier.</value>
+        </member>
+        <member name="P:Abune.Server.Cli.CliClient.LastMessageReceived">
+            <summary>Gets the time stamp of the last message received.</summary>
+            <value>The last message received.</value>
+        </member>
+        <member name="P:Abune.Server.Cli.CliClient.ReliableMessaging">
+            <summary>Gets the reliable messaging.</summary>
+            <value>The reliable messaging.</value>
+        </member>
+        <member name="P:Abune.Server.Cli.CliClient.OnCommand">
+            <summary>Gets or sets the command message handler.</summary>
+            <value>The command action.</value>
+        </member>
+        <member name="P:Abune.Server.Cli.CliClient.OnFrame">
+            <summary>Gets or sets the frame message handler.</summary>
+            <value>The command action.</value>
+        </member>
+        <member name="P:Abune.Server.Cli.CliClient.OnConnected">
+            <summary>Gets or sets the connection handler.</summary>
+            <value>The command action.</value>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.#ctor">
+            <summary>Initializes a new instance of the <a onclick="return false;" href="CliClient" originaltag="see">CliClient</a> class.</summary>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.Connect(System.String,System.Int32,System.Int32,System.UInt32,System.Single,System.Single,System.Single)">
+            <summary>Connects the specified server endpoint.</summary>
+            <param name="serverEndpoint">The server endpoint.</param>
+            <param name="serverPort">The server port.</param>
+            <param name="clientPort">The client port.</param>
+            <param name="clientId">The client identifier.</param>
+            <param name="locationX">The location x.</param>
+            <param name="locationY">The location y.</param>
+            <param name="locationZ">The location z.</param>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.ProcessCommandMessage(Abune.Shared.Message.ObjectCommandEnvelope)">
+            <summary>Processes the command message.</summary>
+            <param name="cmdMsg">The command MSG.</param>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.Dispose(System.Boolean)">
+            <summary>Releases unmanaged and - optionally - managed resources.</summary>
+            <param name="disposing">
+              <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.Dispose">
+            <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.InitializeCommunication(System.UInt32)">
+            <summary>Initializes the communication.</summary>
+            <param name="clientPort">The client port.</param>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.Run">
+            <summary>Runs this instance.</summary>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.SendData(System.Byte[])">
+            <summary>Sends the data.</summary>
+            <param name="sendBuffer">The send buffer.</param>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.SubscribeToDefaultArea">
+            <summary>Subscribes to default area.</summary>
+        </member>
+        <member name="M:Abune.Server.Cli.CliClient.ProcessUdpTransferFrame(Abune.Shared.Protocol.UdpTransferFrame)">
+            <summary>Processes the UDP transfer frame.</summary>
+            <param name="frame">The frame.</param>
+        </member>
+        <member name="T:Abune.Server.Cli.Commands.BaseCliCommand">
+            <summary>Abstract base class for cli commands.</summary>
+        </member>
+        <member name="P:Abune.Server.Cli.Commands.BaseCliCommand.Host">
+            <summary>Gets or sets the host.</summary>
+            <value>The host.</value>
+        </member>
+        <member name="P:Abune.Server.Cli.Commands.BaseCliCommand.Port">
+            <summary>Gets or sets the port.</summary>
+            <value>The port.</value>
+        </member>
+        <member name="P:Abune.Server.Cli.Commands.BaseCliCommand.Log">
+            <summary>Gets or sets the log.</summary>
+            <value>The log.</value>
+        </member>
+        <member name="M:Abune.Server.Cli.Commands.BaseCliCommand.#ctor(System.IO.TextWriter,System.String[])">
+            <summary>Initializes a new instance of the <a onclick="return false;" href="BaseCliCommand" originaltag="see">BaseCliCommand</a> class.</summary>
+            <param name="log">The log.</param>
+            <param name="parameters">The parameters.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">parameters</exception>
+        </member>
+        <member name="T:Abune.Server.Cli.Commands.LoadTest">
+            <summary>Load test command implementation.</summary>
+        </member>
+        <member name="P:Abune.Server.Cli.Commands.LoadTest.ClientCount">
+            <summary>Gets the client count.</summary>
+            <value>The client count.</value>
+        </member>
+        <member name="P:Abune.Server.Cli.Commands.LoadTest.MessageCount">
+            <summary>Gets the message count.</summary>
+            <value>The message count.</value>
+        </member>
+        <member name="M:Abune.Server.Cli.Commands.LoadTest.#ctor(System.IO.TextWriter,System.String[])">
+            <summary>Initializes a new instance of the <a onclick="return false;" href="LoadTest" originaltag="see">LoadTest</a> class.</summary>
+            <param name="log">The log.</param>
+            <param name="parameters">The parameters.</param>
+        </member>
+        <member name="M:Abune.Server.Cli.Commands.LoadTest.Run">
+            <summary>Runs this instance.</summary>
+        </member>
+        <member name="T:Abune.Server.Cli.Program">
+            <summary>Cli runtime program.</summary>
+        </member>
+        <member name="M:Abune.Server.Cli.Program.Main(System.String[])">
+            <summary>Defines the entry point of the application.</summary>
+            <param name="args">The arguments.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">args</exception>
+        </member>
+    </members>
+</doc>

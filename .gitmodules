@@ -1,0 +1,3 @@
+[submodule "src/Abune.Shared"]
+	path = src/Abune.Shared
+	url = git@github.com:abunedotnet/Abune.Shared.git

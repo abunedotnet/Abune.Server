@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Abune.Server.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "loadtest 127.0.0.1 7777 1 1000000"
+    }
+  }
+}
