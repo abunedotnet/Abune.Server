@@ -1,19 +1,44 @@
 # Azure pipeline
 # Copyright (c) Thomas Stollenwerk (motmot80). All rights reserved.
 
-trigger:
-- main
-
 pool:
-  vmImage: 'microsoft/dotnet'
+  vmImage: 'Ubuntu-16.04'
 
 variables:
-  imageName: 'Abune.Server'
+  imageName: 'Abune.Server'  
 
 steps:
-- task: Docker@2
-  displayName: Build Abune.Server 
+- checkout: self
+  submodules: recursive
+- task: gitversion/setup@0
   inputs:
-    repository: $(imageName)
+    versionSpec: 'x'
+- task: gitversion/execute@0
+  inputs:
+    updateAssemblyInfo: false
+- task: replacetokens@3
+  inputs:
+    targetFiles: '**/Dockerfile'
+    encoding: 'auto'
+    writeBOM: false
+    actionOnMissing: 'warn'
+    keepToken: false
+    tokenPrefix: '#{'
+    tokenSuffix: '}#'
+    useLegacyPattern: false
+    enableTelemetry: false
+- task: Docker@2
+  displayName: Build docker image Abune.Server 
+  inputs:
+    repository: 'abunedotnet/abune-server'
+    buildContext: $(Build.Repository.LocalPath)
     command: build
-    Dockerfile: app/Dockerfile
+    tags: $(GitVersion.MajorMinorPatch)
+    Dockerfile: ./build/docker/Dockerfile
+- task: Docker@2
+  displayName: Push to docker hub
+  inputs:
+    containerRegistry: 'dockerHub'
+    repository: 'abunedotnet/abune-server'
+    tags: $(GitVersion.MajorMinorPatch)
+    command: push
