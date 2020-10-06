@@ -4,13 +4,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace UdpAkkaServer
+namespace Abune.Server
 {
     using System;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
     using Abune.Server.Actor;
+    using Abune.Server.Config;
     using Abune.Shared.Message;
     using Akka.Actor;
     using Microsoft.Extensions.Hosting;
@@ -67,7 +68,7 @@ namespace UdpAkkaServer
         private void CreateServerActor()
         {
             IActorRef serverActor = this.system.ActorOf(Props.Create(() => new ServerActor(this.config.Value.ShardCountArea, this.config.Value.ShardCountObject)), "UdpServerActor");
-            serverActor.Tell(new StartServerMessage(new IPEndPoint(IPAddress.Any, 7777)));
+            serverActor.Tell(new StartServerMessage(new IPEndPoint(IPAddress.Any, this.config.Value.ServerPort)));
         }
 
         private void CreateMetricsActor()

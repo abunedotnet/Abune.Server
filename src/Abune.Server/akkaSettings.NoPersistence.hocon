@@ -1,0 +1,30 @@
+﻿akka {
+    stdout-loglevel = INFO
+    loglevel = INFO
+    actor {
+        provider = cluster
+        default-dispatcher {
+            throughput = 1
+        }
+        serializers {
+            hyperion = "Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion"
+        }
+        serialization-bindings {
+            "System.Object" = hyperion
+        }
+    }
+    remote {
+        dot-netty.tcp {
+            port = 7778
+            hostname =  0.0.0.0 # listen on all interfaces
+        }
+    }
+    cluster {
+        seed-nodes = ["akka.tcp://AbuneServer@0.0.0.0:7778"]
+        sharding {
+            remember-entities = true # disable if not enough RAM
+            #passivate-idle-entity-after = off
+            buffer-size = 100000000
+        }
+    }
+}
