@@ -24,7 +24,7 @@ This game server implementation is a based on [Akka.net](https://github.com/akka
 
 
 ## Build Status
-TBD
+[![Build Status](https://dev.azure.com/motmot80/motmot80/_apis/build/status/abunedotnet.Abune.Server?branchName=master)](https://dev.azure.com/motmot80/motmot80/_build/latest?definitionId=3&branchName=master)
 
 ### Documentation and resources
 TBD
