@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Abune.Server.Metrics
+namespace Abune.Server.Config
 {
      /// <summary>Configuration entry for metrics.</summary>
     public class MetricsConfig

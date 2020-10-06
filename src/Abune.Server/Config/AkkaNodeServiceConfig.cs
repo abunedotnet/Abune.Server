@@ -4,10 +4,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace UdpAkkaServer
+namespace Abune.Server.Config
 {
     using System.IO;
-    using Abune.Server.Metrics;
     using Akka.Configuration;
 
     /// <summary>Configuration schema for akka node service.</summary>
@@ -18,6 +17,7 @@ namespace UdpAkkaServer
         /// <summary>Initializes a new instance of the <see cref="AkkaNodeServiceConfig"/> class.</summary>
         public AkkaNodeServiceConfig()
         {
+            this.Metrics = new MetricsConfig();
         }
 
         /// <summary>Gets or sets the name of the system.</summary>
@@ -31,6 +31,10 @@ namespace UdpAkkaServer
         /// <summary>Gets or sets the shard count object.</summary>
         /// <value>The shard count object.</value>
         public int ShardCountObject { get; set; } = 100;
+
+        /// <summary>Gets or sets the server udp port.</summary>
+        /// <value>The server udp port.</value>
+        public int ServerPort { get; set; } = 7777;
 
         /// <summary>Gets or sets the configuration location.</summary>
         /// <value>The configuration location.</value>

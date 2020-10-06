@@ -4,10 +4,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace UdpAkkaServer
+namespace Abune.Server
 {
     using System;
     using System.Threading.Tasks;
+    using Abune.Server.Config;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;

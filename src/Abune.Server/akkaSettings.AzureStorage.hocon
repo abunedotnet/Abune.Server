@@ -20,7 +20,7 @@
         }
     }
     cluster {
-        seed-nodes = ["akka.tcp://Abune.Server@0.0.0.0:7778"]
+        seed-nodes = ["akka.tcp://AbuneServer@0.0.0.0:7778"]
         sharding {
             remember-entities = true # disable if not enough RAM
             #passivate-idle-entity-after = off

@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace UdpAkkaServer
+namespace Abune.Server.Actor
 {
     using System;
     using System.Collections.Generic;
