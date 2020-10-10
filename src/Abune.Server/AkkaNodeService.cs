@@ -14,6 +14,8 @@ namespace Abune.Server
     using Abune.Server.Config;
     using Abune.Shared.Message;
     using Akka.Actor;
+    using Akka.Cluster;
+    using Akka.Cluster.Metrics;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
@@ -73,7 +75,13 @@ namespace Abune.Server
 
         private void CreateMetricsActor()
         {
-            IActorRef serverActor = this.system.ActorOf(Props.Create(() => new MetricsActor(TimeSpan.FromSeconds(this.config.Value.Metrics.IntervalSeconds))), "MetricsActor");
+            Cluster cluster = Cluster.Get(this.system);
+            ClusterMetrics clusterMetrics = ClusterMetrics.Get(this.system);
+            Props props = Props.Create(() => new MetricsActor(
+                TimeSpan.FromSeconds(this.config.Value.Metrics.IntervalSeconds),
+                cluster,
+                clusterMetrics));
+            IActorRef serverActor = this.system.ActorOf(props, "MetricsActor");
         }
     }
 }

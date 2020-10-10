@@ -11,7 +11,7 @@ namespace Abune.Server.Actor.Command
     /// <summary>
     /// Notification command.
     /// </summary>
-    internal class NotifySubscribeObjectExistenceCommand
+    public class NotifySubscribeObjectExistenceCommand
     {
         /// <summary>Gets or sets the object identifier.</summary>
         /// <value>The object identifier.</value>

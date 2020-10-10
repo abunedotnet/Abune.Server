@@ -9,6 +9,8 @@ namespace Abune.Server.Actor
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Abune.Server.Actor.Command;
+    using Abune.Server.Actor.State;
     using Abune.Server.Sharding;
     using Akka.Actor;
     using Akka.Actor.Internal;
@@ -19,6 +21,7 @@ namespace Abune.Server.Actor
     using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.Util;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Actor collecting system metrics.
@@ -26,15 +29,23 @@ namespace Abune.Server.Actor
     public class MetricsActor : ReceiveActor, IWithUnboundedStash
     {
         private readonly ILoggingAdapter log = Logging.GetLogger(Context);
-        private readonly Cluster cluster = Cluster.Get(Context.System);
-        private readonly ClusterMetrics metricsExtension = ClusterMetrics.Get(Context.System);
+        private readonly Cluster cluster;
+        private readonly ClusterMetrics clusterMetrics;
+        private readonly MetricsState state;
         private TimeSpan interval = TimeSpan.MaxValue;
         private ClusterMetricsChanged lastClusterMetrics;
 
-        /// <summary>Initializes a new instance of the <see cref="MetricsActor"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MetricsActor"/> class.
+        /// </summary>
         /// <param name="interval">The interval.</param>
-        public MetricsActor(TimeSpan interval)
+        /// <param name="cluster">The cluster.</param>
+        /// <param name="clusterMetrics">The cluster metrics.</param>
+        public MetricsActor(TimeSpan interval, Cluster cluster, ClusterMetrics clusterMetrics)
         {
+            this.cluster = cluster;
+            this.clusterMetrics = clusterMetrics;
+            this.state = new MetricsState();
             this.interval = interval;
             this.Stash = new UnboundedStashImpl(Context);
             this.Become(() => this.Start());
@@ -53,7 +64,7 @@ namespace Abune.Server.Actor
         {
             base.PreStart();
 
-            this.metricsExtension.Subscribe(this.Self);
+            this.clusterMetrics.Subscribe(this.Self);
         }
 
         /// <summary>User overridable callback.
@@ -64,7 +75,7 @@ namespace Abune.Server.Actor
         {
             base.PostStop();
 
-            this.metricsExtension.Unsubscribe(this.Self);
+            this.clusterMetrics.Unsubscribe(this.Self);
         }
 
         private static void RequestShardRegionStats(string shardRegion)
@@ -77,6 +88,7 @@ namespace Abune.Server.Actor
             this.Stash.UnstashAll();
             this.Receive<ClusterMetricsChanged>(clusterMetrics => this.lastClusterMetrics = clusterMetrics);
             this.Receive<StartMetricsUpdate>(_ => this.Become(this.MetricsQueryObjectShardRegion));
+            this.Receive<RequestStateCommand>(_ => this.RespondState(_.ReplyTo));
             Context.System.Scheduler.ScheduleTellOnce(this.interval, this.Self, new StartMetricsUpdate(), this.Self);
             this.LogClusterMetrics();
         }
@@ -89,6 +101,7 @@ namespace Abune.Server.Actor
                 this.LogShardRegionStats(ShardRegions.OBJECTREGION, shardRegionStats);
                 this.Become(this.MetricsQueryAreaShardRegion);
             });
+            this.Receive<RequestStateCommand>(_ => this.RespondState(_.ReplyTo));
             this.ReceiveAny(_ => this.Stash.Stash());
         }
 
@@ -100,6 +113,7 @@ namespace Abune.Server.Actor
                 this.LogShardRegionStats(ShardRegions.AREAREGION, shardRegionStats);
                 this.Become(() => this.Start());
             });
+            this.Receive<RequestStateCommand>(_ => this.RespondState(_.ReplyTo));
             this.ReceiveAny(_ => this.Stash.Stash());
         }
 
@@ -114,35 +128,54 @@ namespace Abune.Server.Actor
             {
                 if (nodeMetrics.Address.Equals(this.cluster.SelfAddress))
                 {
-                    this.LogMemory(nodeMetrics);
-                    this.LogCpu(nodeMetrics);
+                    this.UpdateMemory(nodeMetrics);
+                    this.UpdateCpu(nodeMetrics);
                 }
             }
         }
 
-        private void LogMemory(NodeMetrics nodeMetrics)
+        private void UpdateMemory(NodeMetrics nodeMetrics)
         {
             Option<StandardMetrics.Memory> memory = StandardMetrics.ExtractMemory(nodeMetrics);
             if (memory.HasValue)
             {
+                this.state.Memory = memory.Value;
                 this.log.Info("METRICS: memory used: {0:0.00} Mb", memory.Value.Used / 1024 / 1024);
             }
         }
 
-        private void LogCpu(NodeMetrics nodeMetrics)
+        private void UpdateCpu(NodeMetrics nodeMetrics)
         {
             Option<StandardMetrics.Cpu> cpu = StandardMetrics.ExtractCpu(nodeMetrics);
             if (cpu.HasValue)
             {
-                this.log.Info("METRICS: cpu load: {0:0.00}% ({1} processors)", cpu.Value.TotalUsage / 100, cpu.Value.ProcessorsNumber);
+                this.state.Cpu = cpu.Value;
+                this.log.Info("METRICS: cpu load: {0:0.00}% ({1} processors)", this.state.Cpu.TotalUsage / 100, this.state.Cpu.ProcessorsNumber);
             }
         }
 
         private void LogShardRegionStats(string shardRegion, ShardRegionStats stats)
         {
-            int areaCount = stats.Stats.Keys.Count();
-            int entitiesTotal = stats.Stats.Values.Sum();
-            this.log.Info($"METRICS: shard region '{shardRegion}': {areaCount} shards, {entitiesTotal} entities");
+            int shardCount = stats.Stats.Keys.Count();
+            int entityCount = stats.Stats.Values.Sum();
+            this.log.Info($"METRICS: shard region '{shardRegion}': {shardCount} shards, {entityCount} entities");
+            if (shardRegion == ShardRegions.AREAREGION)
+            {
+                this.state.AreaEntityCount = entityCount;
+                this.state.AreaShardCount = shardCount;
+            }
+
+            if (shardRegion == ShardRegions.OBJECTREGION)
+            {
+                this.state.ObjectEntityCount = entityCount;
+                this.state.ObjectShardCount = shardCount;
+            }
+        }
+
+        private void RespondState(IActorRef replyTo)
+        {
+            string json = JsonConvert.SerializeObject(this.state);
+            replyTo.Tell(new RespondStateCommand(json));
         }
 
         private class StartMetricsUpdate

@@ -20,6 +20,7 @@ namespace Abune.Server.Actor
     using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.Persistence;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Actor representing a world object.
@@ -35,10 +36,11 @@ namespace Abune.Server.Actor
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectActor"/> class.
         /// </summary>
-        public ObjectActor()
+        /// <param name="shardRegionArea">Area shard region.</param>
+        public ObjectActor(IActorRef shardRegionArea)
         {
             this.state.ObjectId = this.ExtractObjectId();
-            this.shardRegionArea = ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.AREAREGION);
+            this.shardRegionArea = shardRegionArea;
         }
 
         /// <summary>Gets id of the persistent entity for which messages should be replayed.</summary>
@@ -62,6 +64,12 @@ namespace Abune.Server.Actor
                 this.Log.Error("SaveSnapshotFailure");
             }
 
+            if (message is RequestStateCommand)
+            {
+                this.RespondState(((RequestStateCommand)message).ReplyTo);
+                return true;
+            }
+
             if (message is ReceiveTimeout)
             {
                 this.ValidateResetLock();
@@ -73,6 +81,7 @@ namespace Abune.Server.Actor
                 if (this.state.LockOwnerId != 0 && this.state.LockOwnerId != senderId && IsLockProtectedCommand(objCmd.Command.Type))
                 {
                     this.log.Warning($"[Object:{this.state.ObjectId}] type: {objCmd.Command.Type} invalid lock owner");
+                    return false;
                 }
 
                 this.ValidateResetLock();
@@ -171,6 +180,12 @@ namespace Abune.Server.Actor
             }
 
             return false;
+        }
+
+        private void RespondState(IActorRef replyTo)
+        {
+            string json = JsonConvert.SerializeObject(this.state);
+            replyTo.Tell(new RespondStateCommand(json));
         }
 
         private ulong ExtractObjectId()

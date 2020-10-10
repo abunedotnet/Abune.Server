@@ -11,6 +11,8 @@ namespace Abune.Server.Actor
     using System.Globalization;
     using System.Net;
     using Abune.Server.Actor;
+    using Abune.Server.Actor.Command;
+    using Abune.Server.Actor.State;
     using Abune.Server.Sharding;
     using Abune.Shared.Message;
     using Abune.Shared.Protocol;
@@ -18,6 +20,7 @@ namespace Abune.Server.Actor
     using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.IO;
+    using Newtonsoft.Json;
     using static Akka.IO.Udp;
 
     /// <summary>Actor representing a server instance accepting incoming connections.</summary>
@@ -26,18 +29,19 @@ namespace Abune.Server.Actor
         private readonly ILoggingAdapter log = Logging.GetLogger(Context);
         private IActorRef shardRegionObject;
         private IActorRef shardRegionArea;
-        private int shardCountArea;
-        private int shardCountObject;
-        private Dictionary<string, IActorRef> clientTwinActors = new Dictionary<string, IActorRef>();
         private IActorRef udpManagerActor;
+        private ServerState state;
 
-        /// <summary>Initializes a new instance of the <see cref="ServerActor"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServerActor"/> class.
+        /// </summary>
         /// <param name="shardCountArea">The shard count area.</param>
         /// <param name="shardCountObject">The shard count object.</param>
         public ServerActor(int shardCountArea, int shardCountObject)
         {
-            this.shardCountArea = shardCountArea;
-            this.shardCountObject = shardCountObject;
+            this.state = new ServerState();
+            this.state.ShardCountArea = shardCountArea;
+            this.state.ShardCountObject = shardCountObject;
             this.udpManagerActor = Udp.Instance.Apply(Context.System).Manager;
             this.InitializeShardRegions(Context.System);
             this.Receive<StartServerMessage>(c =>
@@ -48,11 +52,15 @@ namespace Abune.Server.Actor
             this.Receive<Terminated>(t =>
             {
                 this.log.Warning($"Client {t.ActorRef.Path.Name} terminated");
-                if (this.clientTwinActors.ContainsKey(t.ActorRef.Path.Name))
+                if (this.state.ClientTwinActors.ContainsKey(t.ActorRef.Path.Name))
                 {
-                    Context.Unwatch(this.clientTwinActors[t.ActorRef.Path.Name]);
-                    this.clientTwinActors.Remove(t.ActorRef.Path.Name);
+                    Context.Unwatch(this.state.ClientTwinActors[t.ActorRef.Path.Name]);
+                    this.state.ClientTwinActors.Remove(t.ActorRef.Path.Name);
                 }
+            });
+            this.Receive<RequestStateCommand>(c =>
+            {
+                this.RespondState(c.ReplyTo);
             });
             this.Receive<Udp.Bound>(c =>
             {
@@ -79,6 +87,12 @@ namespace Abune.Server.Actor
             });
         }
 
+        private static AreaActor CreateAreaActor()
+        {
+            var shardRegionObjects = ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION);
+            return new AreaActor(shardRegionObjects);
+        }
+
         private static string GetClientTwinActorName(EndPoint endpoint)
         {
             IPEndPoint ipEndPoint = endpoint as IPEndPoint;
@@ -93,19 +107,19 @@ namespace Abune.Server.Actor
         private IActorRef GetClientTwinActor(EndPoint endpoint)
         {
             string clientTwinActorName = GetClientTwinActorName(endpoint);
-            if (!this.clientTwinActors.ContainsKey(clientTwinActorName))
+            if (!this.state.ClientTwinActors.ContainsKey(clientTwinActorName))
             {
                 IActorRef clientTwinActor = Context.Child(clientTwinActorName);
                 if (clientTwinActor != Nobody.Instance)
                 {
-                    this.clientTwinActors.Add(clientTwinActorName, clientTwinActor);
+                    this.state.ClientTwinActors.Add(clientTwinActorName, clientTwinActor);
                     return clientTwinActor;
                 }
 
                 return null;
             }
 
-            return this.clientTwinActors[clientTwinActorName];
+            return this.state.ClientTwinActors[clientTwinActorName];
         }
 
         private IActorRef CreateClientTwinActor(IActorRef socketActorRef, uint clientId, EndPoint clientEndPoint)
@@ -118,22 +132,22 @@ namespace Abune.Server.Actor
 
             string clientTwinActorName = GetClientTwinActorName(clientEndPoint);
             this.log.Info($"[Client:{clientId}] creating twin '{clientTwinActorName}'");
-            if (!this.clientTwinActors.ContainsKey(clientTwinActorName))
+            if (!this.state.ClientTwinActors.ContainsKey(clientTwinActorName))
             {
-                this.clientTwinActors.Remove(clientTwinActorName);
+                this.state.ClientTwinActors.Remove(clientTwinActorName);
                 IPEndPoint clientReceiveEndPoint = clientEndPoint as IPEndPoint;
                 if (clientReceiveEndPoint == null)
                 {
                     throw new InvalidOperationException($"invalid endpoint type {clientEndPoint.GetType()}");
                 }
 
-                IActorRef clientTwinActor = Context.System.ActorOf(Props.Create(() => new ClientTwinActor(socketActorRef, clientReceiveEndPoint)), clientTwinActorName);
+                IActorRef clientTwinActor = Context.System.ActorOf(Props.Create(() => new ClientTwinActor(socketActorRef, clientReceiveEndPoint, ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.AREAREGION), ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION))), clientTwinActorName);
                 Context.Watch(clientTwinActor);
-                this.clientTwinActors.Add(clientTwinActorName, clientTwinActor);
+                this.state.ClientTwinActors.Add(clientTwinActorName, clientTwinActor);
                 return clientTwinActor;
             }
 
-            return this.clientTwinActors[clientTwinActorName];
+            return this.state.ClientTwinActors[clientTwinActorName];
         }
 
         private void LogUdpMessage(Udp.Received recv)
@@ -144,8 +158,14 @@ namespace Abune.Server.Actor
 
         private void InitializeShardRegions(ActorSystem system)
         {
-            this.shardRegionObject = ClusterSharding.Get(system).Start(typeName: ShardRegions.OBJECTREGION, entityProps: Props.Create<ObjectActor>(), settings: ClusterShardingSettings.Create(system), messageExtractor: new ObjectRegionMessageExtractor(this.shardCountObject));
-            this.shardRegionArea = ClusterSharding.Get(system).Start(typeName: ShardRegions.AREAREGION, entityProps: Props.Create<AreaActor>(), settings: ClusterShardingSettings.Create(system), messageExtractor: new AreaRegionMessageExtractor(this.shardCountArea));
+            this.shardRegionObject = ClusterSharding.Get(system).Start(typeName: ShardRegions.OBJECTREGION, entityProps: Props.Create(() => new ObjectActor(this.shardRegionArea)), settings: ClusterShardingSettings.Create(system), messageExtractor: new ObjectRegionMessageExtractor(this.state.ShardCountObject));
+            this.shardRegionArea = ClusterSharding.Get(system).Start(typeName: ShardRegions.AREAREGION, entityProps: Props.Create(() => new AreaActor(this.shardRegionObject)), settings: ClusterShardingSettings.Create(system), messageExtractor: new AreaRegionMessageExtractor(this.state.ShardCountArea));
+        }
+
+        private void RespondState(IActorRef replyTo)
+        {
+            string json = JsonConvert.SerializeObject(this.state);
+            replyTo.Tell(new RespondStateCommand(json));
         }
 
         private void ProcessClientFrame(IActorRef socketActorRef, Received received, UdpTransferFrame udpTransferFrame)

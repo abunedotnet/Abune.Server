@@ -13,11 +13,21 @@ namespace Abune.Server.Actor.State
     public class AreaState
     {
         /// <summary>Initializes a new instance of the <see cref="AreaState"/> class.</summary>
-        public AreaState()
+        /// <param name="areaId">Identifier of the area.</param>
+        public AreaState(ulong areaId)
         {
+            this.AreaId = areaId;
             this.Subscriptions = new Dictionary<IActorRef, Subscription>();
             this.Objects = new Dictionary<ulong, object>();
         }
+
+        /// <summary>
+        /// Gets the area identifier.
+        /// </summary>
+        /// <value>
+        /// The area identifier.
+        /// </value>
+        public ulong AreaId { get; private set; }
 
         /// <summary>Gets the subscriptions.</summary>
         /// <value>The subscriptions.</value>
