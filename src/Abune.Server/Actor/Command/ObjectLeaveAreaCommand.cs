@@ -9,7 +9,7 @@ namespace Abune.Server.Command
     using Abune.Server.Actor.Events;
 
     /// <summary>Command for object leaving area.</summary>
-    internal class ObjectLeaveAreaCommand : IInternalCommand
+    public class ObjectLeaveAreaCommand : IInternalCommand
     {
         /// <summary>Gets or sets the object identifier.</summary>
         /// <value>The object identifier.</value>

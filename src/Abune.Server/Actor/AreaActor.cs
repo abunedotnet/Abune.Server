@@ -18,26 +18,28 @@ namespace Abune.Server.Actor
     using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.Persistence;
+    using Newtonsoft.Json;
 
     /// <summary>Actor representing areas.</summary>
     public class AreaActor : PersistentActor
     {
         private readonly ILoggingAdapter log = Logging.GetLogger(Context);
-        private readonly ulong areaId;
-        private AreaState state = new AreaState();
+        private AreaState state;
         private IActorRef shardRegionObject;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AreaActor"/> class.
         /// </summary>
-        public AreaActor()
+        /// <param name="shardRegionObject">Object shard region.</param>
+        public AreaActor(IActorRef shardRegionObject)
         {
-            this.areaId = this.ExtractObjectId();
-            this.shardRegionObject = ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION);
+            ulong areaId = this.ExtractObjectId();
+            this.state = new AreaState(areaId);
+            this.shardRegionObject = shardRegionObject;
         }
 
         /// <summary>Gets id of the persistent entity for which messages should be replayed.</summary>
-        public override string PersistenceId => $"AREA-{this.areaId}";
+        public override string PersistenceId => $"AREA-{this.state.AreaId}";
 
         /// <summary>
         /// Command handler. Typically validates commands against current state - possibly by communicating with other actors.
@@ -50,11 +52,19 @@ namespace Abune.Server.Actor
             if (message is SaveSnapshotSuccess)
             {
                 this.log.Debug("SaveSnapshotSuccess");
+                return true;
             }
 
             if (message is SaveSnapshotFailure)
             {
                 this.log.Error("SaveSnapshotFailure");
+                return true;
+            }
+
+            if (message is RequestStateCommand)
+            {
+                this.RespondState(((RequestStateCommand)message).ReplyTo);
+                return true;
             }
 
             if (message is AreaCommandEnvelope)
@@ -103,6 +113,12 @@ namespace Abune.Server.Actor
             }
 
             return true;
+        }
+
+        private void RespondState(IActorRef replyTo)
+        {
+            string json = JsonConvert.SerializeObject(this.state);
+            replyTo.Tell(new RespondStateCommand(json));
         }
 
         private ulong ExtractObjectId()

@@ -8,6 +8,7 @@ namespace Abune.Server.Actor
 {
     using System;
     using System.Net;
+    using Abune.Server.Actor.Command;
     using Abune.Server.Actor.State;
     using Abune.Server.Sharding;
     using Abune.Shared.Command;
@@ -18,6 +19,8 @@ namespace Abune.Server.Actor
     using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.IO;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using static Akka.IO.Udp;
 
     /// <summary>Actor representing a connected game client.</summary>
@@ -26,21 +29,25 @@ namespace Abune.Server.Actor
         private readonly ILoggingAdapter log = Logging.GetLogger(Context);
         private readonly TimeSpan keepAliveInterval = TimeSpan.FromSeconds(10);
         private readonly TimeSpan clientTimeout = TimeSpan.FromMinutes(5);
-        private ClientTwinState state = new ClientTwinState();
+        private readonly ClientTwinState state = new ClientTwinState();
         private ReliableUdpMessaging reliableClientMessaging = new ReliableUdpMessaging();
         private IActorRef shardRegionArea;
         private IActorRef shardRegionObject;
         private IActorRef udpSenderActor;
 
-        /// <summary>Initializes a new instance of the <see cref="ClientTwinActor"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClientTwinActor"/> class.
+        /// </summary>
         /// <param name="socketActorRef">The socket actor reference.</param>
         /// <param name="endpoint">The endpoint.</param>
-        public ClientTwinActor(IActorRef socketActorRef, IPEndPoint endpoint)
+        /// <param name="shardRegionArea">The shard region area.</param>
+        /// <param name="shardRegionObject">The shard region object.</param>
+        public ClientTwinActor(IActorRef socketActorRef, IPEndPoint endpoint, IActorRef shardRegionArea, IActorRef shardRegionObject)
         {
             this.state.Endpoint = endpoint;
             this.udpSenderActor = socketActorRef;
-            this.shardRegionObject = ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION);
-            this.shardRegionArea = ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.AREAREGION);
+            this.shardRegionObject = shardRegionArea;
+            this.shardRegionArea = shardRegionObject;
             this.reliableClientMessaging.OnProcessCommandMessage = this.ProcessCommandMessage;
             this.reliableClientMessaging.OnSendFrame = this.SendFrameToClient;
             this.reliableClientMessaging.OnDeadLetter = this.OnDeadLetter;
@@ -48,6 +55,10 @@ namespace Abune.Server.Actor
             {
                 this.ProcessUdpTransferFrame(c);
                 this.SynchronizeMessages();
+            });
+            this.Receive<RequestStateCommand>(c =>
+            {
+                this.RespondState(c.ReplyTo);
             });
             this.Receive<ObjectCommandRequestEnvelope>(c =>
             {
@@ -213,6 +224,14 @@ namespace Abune.Server.Actor
             }
         }
 
+        private void RespondState(IActorRef replyTo)
+        {
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new IPEndpointConverter());
+            string json = JsonConvert.SerializeObject(this.state, settings);
+            replyTo.Tell(new RespondStateCommand(json));
+        }
+
         /// <summary>
         /// TimeOffset = (t1 - t0) - (t2 - t3)
         /// Rountrip = (t3 - t0) - (t2 - t1)
@@ -246,6 +265,54 @@ namespace Abune.Server.Actor
         {
             this.state.LastKeepAliveUtc = DateTime.UtcNow;
             this.SetReceiveTimeout(this.keepAliveInterval);
+        }
+
+        private class IPEndpointConverter : JsonConverter
+        {
+            /// <summary>
+            /// Determines whether this instance can convert the specified object type.
+            /// </summary>
+            /// <param name="objectType">Type of the object.</param>
+            /// <returns>
+            /// <c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.
+            /// </returns>
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(IPEndPoint);
+            }
+
+            /// <summary>
+            /// Writes the JSON representation of the object.
+            /// </summary>
+            /// <param name="writer">The <see cref="Newtonsoft.Json.JsonWriter" /> to write to.</param>
+            /// <param name="value">The value.</param>
+            /// <param name="serializer">The calling serializer.</param>
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                var ep = (IPEndPoint)value;
+                var jo = new JObject();
+                jo.Add("Address", ep.Address.ToString());
+                jo.Add("Port", ep.Port);
+                jo.WriteTo(writer);
+            }
+
+            /// <summary>
+            /// Reads the JSON representation of the object.
+            /// </summary>
+            /// <param name="reader">The <see cref="Newtonsoft.Json.JsonReader" /> to read from.</param>
+            /// <param name="objectType">Type of the object.</param>
+            /// <param name="existingValue">The existing value of object being read.</param>
+            /// <param name="serializer">The calling serializer.</param>
+            /// <returns>
+            /// The object value.
+            /// </returns>
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                var jo = JObject.Load(reader);
+                var address = jo["Address"].ToObject<IPAddress>(serializer);
+                int port = (int)jo["Port"];
+                return new IPEndPoint(address, port);
+            }
         }
     }
 }

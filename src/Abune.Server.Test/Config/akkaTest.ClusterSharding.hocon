@@ -1,0 +1,39 @@
+﻿akka {
+    loggers = ["Akka.TestKit.TestEventListener, Akka.TestKit"]
+    test {
+        timefactor = 1.0
+        filter-leeway = 3s
+        single-expect-default = 3s
+        default-timeout = 5s
+        calling-thread-dispatcher {
+            type = "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
+            throughput = 2147483647
+        }
+        test-actor = {
+            dispatcher = {
+                type = "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
+                throughput = 2147483647
+            }
+        }
+        remote {
+            dot-netty {
+                tcp {
+                    batching {
+                        enabled = false
+                    }
+                    port = 7778
+                    hostname =  0.0.0.0 # listen on all interfaces
+                }
+            }
+        }
+    }
+    actor {
+        provider = cluster
+    }
+    cluster {
+        seed-nodes = ["akka.tcp://AbuneServer@0.0.0.0:7778"]
+        sharding {
+            buffer-size = 100000000
+        }
+    }
+}
