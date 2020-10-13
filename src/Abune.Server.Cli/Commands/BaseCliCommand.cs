@@ -16,9 +16,15 @@ namespace Abune.Server.Cli.Commands
         /// <summary>Gets or sets the host.</summary>
         /// <value>The host.</value>
         protected string Host { get; set; }
+
         /// <summary>Gets or sets the port.</summary>
         /// <value>The port.</value>
         protected int Port { get; set; }
+
+        /// <summary>Gets or sets the token signing key.</summary>
+        /// <value>The token signing key.</value>
+        protected string TokenSigningKey { get; set; }
+
         /// <summary>Gets or sets the log.</summary>
         /// <value>The log.</value>
         protected TextWriter Log { get; set; }
@@ -29,13 +35,14 @@ namespace Abune.Server.Cli.Commands
         /// <exception cref="ArgumentOutOfRangeException">parameters</exception>
         protected BaseCliCommand(TextWriter log, string[] parameters)
         {
-            if (parameters == null || parameters.Length != 2)
+            if (parameters == null || parameters.Length < 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(parameters));
             }
             Log = log;
             Host = parameters[0];
             Port = int.Parse(parameters[1], CultureInfo.InvariantCulture);
+            TokenSigningKey = parameters[2];
         }
     }
 }

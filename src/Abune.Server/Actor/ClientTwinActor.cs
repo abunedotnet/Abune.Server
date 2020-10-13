@@ -8,6 +8,7 @@ namespace Abune.Server.Actor
 {
     using System;
     using System.Net;
+    using System.Text;
     using Abune.Server.Actor.Command;
     using Abune.Server.Actor.State;
     using Abune.Server.Sharding;
@@ -16,6 +17,7 @@ namespace Abune.Server.Actor
     using Abune.Shared.Protocol;
     using Abune.Shared.Util;
     using Akka.Actor;
+    using Akka.Actor.Internal;
     using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.IO;
@@ -24,7 +26,7 @@ namespace Abune.Server.Actor
     using static Akka.IO.Udp;
 
     /// <summary>Actor representing a connected game client.</summary>
-    public class ClientTwinActor : ReceiveActor
+    public class ClientTwinActor : ReceiveActor, IWithUnboundedStash
     {
         private readonly ILoggingAdapter log = Logging.GetLogger(Context);
         private readonly TimeSpan keepAliveInterval = TimeSpan.FromSeconds(10);
@@ -34,31 +36,103 @@ namespace Abune.Server.Actor
         private IActorRef shardRegionArea;
         private IActorRef shardRegionObject;
         private IActorRef udpSenderActor;
+        private IActorRef authenticationActor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientTwinActor"/> class.
         /// </summary>
         /// <param name="socketActorRef">The socket actor reference.</param>
+        /// <param name="authenticationActorRef">The authentication actor ref.</param>
         /// <param name="endpoint">The endpoint.</param>
         /// <param name="shardRegionArea">The shard region area.</param>
         /// <param name="shardRegionObject">The shard region object.</param>
-        public ClientTwinActor(IActorRef socketActorRef, IPEndPoint endpoint, IActorRef shardRegionArea, IActorRef shardRegionObject)
+        public ClientTwinActor(IActorRef socketActorRef, IActorRef authenticationActorRef, IPEndPoint endpoint, IActorRef shardRegionArea, IActorRef shardRegionObject)
         {
-            this.state.Endpoint = endpoint;
             this.udpSenderActor = socketActorRef;
-            this.shardRegionObject = shardRegionArea;
-            this.shardRegionArea = shardRegionObject;
+            this.authenticationActor = authenticationActorRef;
+            this.state.Endpoint = endpoint;
+            this.shardRegionObject = shardRegionObject;
+            this.shardRegionArea = shardRegionArea;
             this.reliableClientMessaging.OnProcessCommandMessage = this.ProcessCommandMessage;
             this.reliableClientMessaging.OnSendFrame = this.SendFrameToClient;
             this.reliableClientMessaging.OnDeadLetter = this.OnDeadLetter;
+            this.Stash = new BoundedStashImpl(Context);
+            this.Become(this.BecomeAuthenticating);
+        }
+
+        /// <summary>Gets or sets the stash.</summary>
+        /// <value>The stash.</value>
+        public IStash Stash { get; set; }
+
+        private static MessageControlFlags GetControlFlags(ObjectCommandResponseEnvelope command)
+        {
+            switch (command.Message.Command.Type)
+            {
+                case CommandType.ObjectCreate:
+                case CommandType.ObjectDestroy:
+                case CommandType.ObjectLock:
+                case CommandType.ObjectUnlock:
+                case CommandType.SubscribeArea:
+                case CommandType.UnsubscribeArea:
+                    return MessageControlFlags.QOS0;
+                default:
+                    return MessageControlFlags.QOS0;
+            }
+        }
+
+        private static string GetAbuneSharedAssemblyVersion()
+        {
+            return typeof(ServerAuthenticationRequest).Assembly.GetName().Version.ToString();
+        }
+
+        private static string BuildAuthenticationChallenge()
+        {
+            var random = new Random();
+            var authenticationChallenge = new StringBuilder();
+            authenticationChallenge.Append(random.Next(0, int.MaxValue));
+            return authenticationChallenge.ToString();
+        }
+
+        private void BecomeAuthenticating()
+        {
             this.Receive<UdpTransferFrame>(c =>
             {
-                this.ProcessUdpTransferFrame(c);
+                this.ProcessUdpLoginFrame(c);
                 this.SynchronizeMessages();
+            });
+            this.Receive<AuthenticationSuccess>(c =>
+            {
+                this.state.Authenticated = true;
+                this.WelcomeClient();
+                this.Become(this.BecomeActive);
+            });
+            this.Receive<AuthenticationFailure>(c =>
+            {
+                this.log.Debug($"[Client:{this.state.ClientId}] failed to authenticate: {c.Error}");
+                this.Self.Tell(PoisonPill.Instance);
+            });
+            this.Receive<ReceiveTimeout>(r =>
+            {
+                this.log.Warning($"[Client:{this.state.ClientId}] timed out");
+                this.Self.Tell(PoisonPill.Instance);
+            });
+            this.Receive<CommandFailed>(c =>
+            {
+                this.log.Error($"Command failed: {c.Cmd}");
             });
             this.Receive<RequestStateCommand>(c =>
             {
                 this.RespondState(c.ReplyTo);
+            });
+            this.ReceiveAny(_ => this.Stash.Stash());
+        }
+
+        private void BecomeActive()
+        {
+            this.Receive<UdpTransferFrame>(c =>
+            {
+                this.ProcessUdpTransferFrame(c);
+                this.SynchronizeMessages();
             });
             this.Receive<ObjectCommandRequestEnvelope>(c =>
             {
@@ -82,22 +156,11 @@ namespace Abune.Server.Actor
             {
                 this.log.Error($"Command failed: {c.Cmd}");
             });
-        }
-
-        private static MessageControlFlags GetControlFlags(ObjectCommandResponseEnvelope command)
-        {
-            switch (command.Message.Command.Type)
+            this.Receive<RequestStateCommand>(c =>
             {
-                case CommandType.ObjectCreate:
-                case CommandType.ObjectDestroy:
-                case CommandType.ObjectLock:
-                case CommandType.ObjectUnlock:
-                case CommandType.SubscribeArea:
-                case CommandType.UnsubscribeArea:
-                    return MessageControlFlags.QOS0;
-                default:
-                    return MessageControlFlags.QOS0;
-            }
+                this.RespondState(c.ReplyTo);
+            });
+            this.Stash.UnstashAll();
         }
 
         private void SynchronizeMessages()
@@ -125,17 +188,31 @@ namespace Abune.Server.Actor
             this.udpSenderActor.Tell(Udp.Send.Create(ByteString.FromBytes(frame.Serialize()), this.state.Endpoint), this.Self);
         }
 
-        private void ProcessUdpTransferFrame(UdpTransferFrame frame)
+        private void ProcessUdpLoginFrame(UdpTransferFrame frame)
         {
-            this.UpdateKeepAlive();
             switch (frame.Type)
             {
                 case FrameType.ClientHello:
                     var msgClientHello = new ClientHelloMessage(frame.MessageBuffer);
                     this.state.ClientId = msgClientHello.ClientId;
-                    var msgServerHello = new ServerHelloMessage() { Message = $"Hello {msgClientHello.ClientId}" };
-                    this.SendFrameToClient(FrameType.ServerHello, msgServerHello.Serialize());
+                    this.state.ClientVersion = msgClientHello.Version;
+                    this.RequestAuthentication();
                     break;
+                case FrameType.ClientAuthenticationResponse:
+                    var msgClientAuthenticationResponse = new ClientAuthenticationResponse(frame.MessageBuffer);
+                    this.AuthenticateClient(msgClientAuthenticationResponse);
+                    break;
+                default:
+                    this.log.Warning($"[Client:{this.state.ClientId} => Server] not authenticated - unexpected frame type '{frame.Type}'");
+                    break;
+            }
+        }
+
+        private void ProcessUdpTransferFrame(UdpTransferFrame frame)
+        {
+            this.UpdateKeepAlive();
+            switch (frame.Type)
+            {
                 case FrameType.ClientPing:
                     this.log.Debug($"[Client:{this.state.ClientId} => Server] PING");
                     var cmdClientPing = new ClientPingMessage(frame.MessageBuffer);
@@ -265,6 +342,39 @@ namespace Abune.Server.Actor
         {
             this.state.LastKeepAliveUtc = DateTime.UtcNow;
             this.SetReceiveTimeout(this.keepAliveInterval);
+        }
+
+        private void WelcomeClient()
+        {
+            string engineVersion = GetAbuneSharedAssemblyVersion();
+            if (this.state.ClientVersion != engineVersion)
+            {
+                var msgServerHelloFail = new ServerHelloMessage() { Message = $"FAIL: INVALID CLIENT VERSION '{this.state.ClientVersion}'", Version = GetAbuneSharedAssemblyVersion() };
+                this.log.Error($"[{this.state.ClientId}] invalid version: {this.state.ClientVersion}");
+                this.SendFrameToClient(FrameType.ServerHello, msgServerHelloFail.Serialize());
+                this.Self.Tell(PoisonPill.Instance);
+                return;
+            }
+
+            var msgServerHello = new ServerHelloMessage() { Message = $"HELLO {this.state.ClientId}", Version = GetAbuneSharedAssemblyVersion() };
+            this.SendFrameToClient(FrameType.ServerHello, msgServerHello.Serialize());
+        }
+
+        private void RequestAuthentication()
+        {
+            this.state.AuthenticationChallenge = BuildAuthenticationChallenge();
+            var msgAuthenticationRequest = new ServerAuthenticationRequest() { AuthenticationChallenge = this.state.AuthenticationChallenge };
+            this.SendFrameToClient(FrameType.ServerAuthenticationRequest, msgAuthenticationRequest.Serialize());
+        }
+
+        private void AuthenticateClient(ClientAuthenticationResponse msg)
+        {
+            this.authenticationActor.Tell(new RequestAuthenticationCommand()
+            {
+                ReplyTo = this.Self,
+                Token = msg.AuthenticationToken,
+                AuthenticationChallenge = this.state.AuthenticationChallenge,
+            });
         }
 
         private class IPEndpointConverter : JsonConverter

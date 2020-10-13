@@ -7,6 +7,7 @@
 namespace Abune.Server.Cli.Commands
 {
     using System;
+    using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
@@ -16,7 +17,6 @@ namespace Abune.Server.Cli.Commands
     using Abune.Shared.Message;
     using Abune.Shared.Protocol;
     using Abune.Shared.Util;
-    using Akka.Util.Internal;
     using System.Globalization;
 
     /// <summary>Load test command implementation.</summary>
@@ -71,8 +71,8 @@ namespace Abune.Server.Cli.Commands
         /// <param name="parameters">The parameters.</param>
         public LoadTest(TextWriter log, string [] parameters) : base(log, parameters)
         {
-            ClientCount = int.Parse(parameters[2], CultureInfo.InvariantCulture);
-            MessageCount = int.Parse(parameters[3], CultureInfo.InvariantCulture);
+            ClientCount = int.Parse(parameters[3], CultureInfo.InvariantCulture);
+            MessageCount = int.Parse(parameters[4], CultureInfo.InvariantCulture);
         }
 
         /// <summary>Runs this instance.</summary>
@@ -138,16 +138,19 @@ namespace Abune.Server.Cli.Commands
         private void OutputStatistics(IEnumerable<ClientStatistic> statistics)
         {
             var statisticsNormalized = new Dictionary<string, MessageStatistic>();
-            statistics.ForEach(s => s.MessageStatistic.ForEach(g =>
+            foreach(var statistic in statistics)
             {
-                if (!statisticsNormalized.ContainsKey(g.Key))
+                foreach(var messageStatistic in statistic.MessageStatistic)
                 {
-                    statisticsNormalized.Add(g.Key, new MessageStatistic());
+                    if (!statisticsNormalized.ContainsKey(messageStatistic.Key))
+                    {
+                        statisticsNormalized.Add(messageStatistic.Key, new MessageStatistic());
+                    }
+                    statisticsNormalized[messageStatistic.Key].Duration += messageStatistic.Value.Duration;
+                    statisticsNormalized[messageStatistic.Key].MessagesTotal += messageStatistic.Value.MessagesTotal;
+                    statisticsNormalized[messageStatistic.Key].MessagesAnswered += messageStatistic.Value.MessagesAnswered;
                 }
-                statisticsNormalized[g.Key].Duration += g.Value.Duration;
-                statisticsNormalized[g.Key].MessagesTotal += g.Value.MessagesTotal;
-                statisticsNormalized[g.Key].MessagesAnswered += g.Value.MessagesAnswered;
-            }));
+            }
 
             int messagesTotal = 0;
             int messagesAnsweredTotal = 0;
@@ -185,7 +188,7 @@ namespace Abune.Server.Cli.Commands
                 float locationY = clientId * Locator.AREASIZE;
                 float locationZ = clientId * Locator.AREASIZE;
 
-                client.Connect(Host, Port, 0, clientId, locationX, locationY, locationZ);
+                client.Connect(Host, Port, 0, TokenSigningKey, clientId, locationX, locationY, locationZ);
                 AutoResetEvent eventFinished = new AutoResetEvent(false);
                 var statistics = new ClientStatistic();
                 statistics.ClientId = clientId;
@@ -256,13 +259,15 @@ namespace Abune.Server.Cli.Commands
             }
             TimeSpan sumLatency = TimeSpan.Zero;
             int countSuccess = 0;
-            messages.Values.ForEach(_ =>
+            foreach (var value in messages.Values)
             {
-                if (_.ResponseTimeStamp == DateTime.MinValue)
-                    return;
+                if (value.ResponseTimeStamp == DateTime.MinValue)
+                {
+                    break;
+                }
                 countSuccess++;
-                sumLatency += _.ResponseTimeStamp - _.RequestTimeStamp;
-            });
+                sumLatency += value.ResponseTimeStamp - value.RequestTimeStamp;
+            }
             MessageStatistic messageStatistic = new MessageStatistic();
             messageStatistic.Duration = client.LastMessageReceived - startTimeStamp;
             messageStatistic.MessagesTotal = messageCount;

@@ -22,9 +22,9 @@
     cluster {
         seed-nodes = ["akka.tcp://AbuneServer@0.0.0.0:7778"]
         sharding {
-            remember-entities = true # disable if not enough RAM
-            #passivate-idle-entity-after = off
-            buffer-size = 100000000
+            # remember-entities = true # disable if not enough RAM using persistence module
+            passivate-idle-entity-after = off # enable if not enough RAM using persistence module
+            buffer-size = 1000000
         }
     }
 }

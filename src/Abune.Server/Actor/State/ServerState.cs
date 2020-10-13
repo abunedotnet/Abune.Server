@@ -7,6 +7,7 @@
 namespace Abune.Server.Actor.State
 {
     using System.Collections.Generic;
+    using System.Security;
     using Akka.Actor;
 
     /// <summary>Sevrer actor state.</summary>
@@ -35,6 +36,30 @@ namespace Abune.Server.Actor.State
         /// The shard count object.
         /// </value>
         public int ShardCountObject { get; set; }
+
+        /// <summary>
+        /// Gets or sets the auth0 issuer.
+        /// </summary>
+        /// <value>
+        /// The auth0 issuer.
+        /// </value>
+        public string Auth0Issuer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the auth0 audience.
+        /// </summary>
+        /// <value>
+        /// The auth0 audience.
+        /// </value>
+        public string Auth0Audience { get; set; }
+
+        /// <summary>
+        /// Gets or sets the signing key.
+        /// </summary>
+        /// <value>
+        /// The signing key.
+        /// </value>
+        public string SigningKey { get; set; }
 
         /// <summary>
         /// Gets the client twin actors.
