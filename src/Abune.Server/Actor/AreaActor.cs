@@ -30,12 +30,17 @@ namespace Abune.Server.Actor
         /// <summary>
         /// Initializes a new instance of the <see cref="AreaActor"/> class.
         /// </summary>
-        /// <param name="shardRegionObject">Object shard region.</param>
-        public AreaActor(IActorRef shardRegionObject)
+        /// <param name="shardRegionResolver">Shard region resolver.</param>
+        public AreaActor(IShardRegionResolver shardRegionResolver)
         {
+            if (shardRegionResolver == null)
+            {
+                throw new ArgumentNullException(nameof(shardRegionResolver));
+            }
+
             ulong areaId = this.ExtractObjectId();
             this.state = new AreaState(areaId);
-            this.shardRegionObject = shardRegionObject;
+            this.shardRegionObject = shardRegionResolver.GetShardRegion(ShardRegions.OBJECTREGION);
         }
 
         /// <summary>Gets id of the persistent entity for which messages should be replayed.</summary>

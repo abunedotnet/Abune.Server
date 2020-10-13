@@ -26,6 +26,7 @@ namespace Abune.Server.Cli
         private IPEndPoint localEndPoint;
         private IPEndPoint serverEndPoint;
         private float locationX, locationY, locationZ;
+        private string signingKeyBase64;
 
         /// <summary>Gets or sets the client identifier.</summary>
         /// <value>The client identifier.</value>
@@ -64,16 +65,18 @@ namespace Abune.Server.Cli
         /// <param name="serverEndpoint">The server endpoint.</param>
         /// <param name="serverPort">The server port.</param>
         /// <param name="clientPort">The client port.</param>
+        /// <param name="signingKeyBase64">Signing key for token generation.</param>
         /// <param name="clientId">The client identifier.</param>
         /// <param name="locationX">The location x.</param>
         /// <param name="locationY">The location y.</param>
         /// <param name="locationZ">The location z.</param>
-        public void Connect(string serverEndpoint, int serverPort, int clientPort, uint clientId, float locationX, float locationY, float locationZ)
+        public void Connect(string serverEndpoint, int serverPort, int clientPort, string signingKeyBase64, uint clientId, float locationX, float locationY, float locationZ)
         {
             this.locationX = locationX;
             this.locationY = locationY;
             this.locationZ = locationZ;
             this.ClientId = clientId;
+            this.signingKeyBase64 = signingKeyBase64;
             if (this.ClientId == 0)
             {
                 var random = new System.Random();
@@ -92,15 +95,15 @@ namespace Abune.Server.Cli
                 serverEndPoint = new IPEndPoint(hostEntry, serverPort);
             }
 
-            client = new UdpClient(clientPort);
+            this.client = new UdpClient(clientPort);
 
             //receive       
-            localEndPoint = new IPEndPoint(IPAddress.Any, ((IPEndPoint)client.Client.LocalEndPoint).Port);
+            this.localEndPoint = new IPEndPoint(IPAddress.Any, ((IPEndPoint)client.Client.LocalEndPoint).Port);
 
             InitializeCommunication((uint)localEndPoint.Port);
 
-            thread = new Thread(Run);
-            thread.Start();
+            this.thread = new Thread(Run);
+            this.thread.Start();
         }
 
         /// <summary>Processes the command message.</summary>
@@ -134,16 +137,20 @@ namespace Abune.Server.Cli
             Dispose(true);
             GC.SuppressFinalize(this);            
         }
+        private static string GetAbuneSharedAssemblyVersion()
+        {
+            return typeof(ClientHelloMessage).Assembly.GetName().Version.ToString();
+        }
 
         /// <summary>Initializes the communication.</summary>
         /// <param name="clientPort">The client port.</param>
         private void InitializeCommunication(uint clientPort)
         {
-            var msgClientHello = new ClientHelloMessage() { ClientId = ClientId, ClientPort = clientPort, Message = $"Hello from {ClientId}" };
+            var msgClientHello = new ClientHelloMessage() { ClientId = ClientId, ClientPort = clientPort, Message = $"Hello from {ClientId}", Version = GetAbuneSharedAssemblyVersion() };
             UdpTransferFrame frame = new UdpTransferFrame(FrameType.ClientHello, msgClientHello.Serialize());
             ReliableMessaging.OnSendFrame(frame);
         }
-
+        
         /// <summary>Runs this instance.</summary>
         private void Run()
         {
@@ -171,12 +178,25 @@ namespace Abune.Server.Cli
             ReliableMessaging.SendCommand(0, new SubscribeAreaCommand(ClientId, areaId, 0), 0);
         }
 
+        private void ProcessAuthenticationRequest(ServerAuthenticationRequest request, string signingKey)
+        {
+            var offlineTokenProvider = new OfflineTokenProvider("", signingKey);
+            string token = offlineTokenProvider.CreateJWTToken(request.AuthenticationChallenge, DateTime.UtcNow.AddMinutes(15));
+            var cmdClientAuthenticationResponse = new ClientAuthenticationResponse() { AuthenticationToken = token };
+            ReliableMessaging.OnSendFrame(new UdpTransferFrame(FrameType.ClientAuthenticationResponse, cmdClientAuthenticationResponse.Serialize()));
+        }
+
         /// <summary>Processes the UDP transfer frame.</summary>
         /// <param name="frame">The frame.</param>
         private void ProcessUdpTransferFrame(UdpTransferFrame frame)
         {
             switch (frame.Type)
             {
+                case FrameType.ServerAuthenticationRequest:
+                    var msgAuthenticationRequest = new ServerAuthenticationRequest(frame.MessageBuffer);
+                    ProcessAuthenticationRequest(msgAuthenticationRequest, this.signingKeyBase64);
+                    break;
+
                 case FrameType.ServerHello:
                     SubscribeToDefaultArea();
                     if (OnConnected != null)

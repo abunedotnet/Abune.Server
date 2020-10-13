@@ -4,6 +4,21 @@
         <name>Abune.Shared</name>
     </assembly>
     <members>
+        <member name="T:Abune.Shared.Command.AuthenticationConstants">
+            <summary>
+            Constants for authentication.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Command.AuthenticationConstants.JwtClaims">
+            <summary>
+            Constants for jwt claims.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.AuthenticationConstants.JwtClaims.AUTHENTICATIONCHALLENGE">
+            <summary>
+            The authentication challenge.
+            </summary>
+        </member>
         <member name="T:Abune.Shared.Command.BaseCommand">
             <summary>
             Base class for all commands.
@@ -781,6 +796,24 @@
             <summary>  Gets the object identifier to route to.</summary>
             <value>Object identifier.</value>
         </member>
+        <member name="T:Abune.Shared.Message.ClientAuthenticationResponse">
+            <summary>Server authentication request.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientAuthenticationResponse.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ClientAuthenticationResponse" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientAuthenticationResponse.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ClientAuthenticationResponse" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientAuthenticationResponse.AuthenticationToken">
+            <summary>Gets or sets the authentication token.</summary>
+            <value>The authentication token.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ClientAuthenticationResponse.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
         <member name="T:Abune.Shared.Message.ClientHelloMessage">
             <summary>Client hello message.</summary>
         </member>
@@ -804,6 +837,10 @@
         <member name="P:Abune.Shared.Message.ClientHelloMessage.Message">
             <summary>Gets or sets the message.</summary>
             <value>The message.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ClientHelloMessage.Version">
+            <summary>Gets or sets the client version.</summary>
+            <value>The client version.</value>
         </member>
         <member name="M:Abune.Shared.Message.ClientHelloMessage.Serialize">
             <summary>Serializes this instance.</summary>
@@ -878,6 +915,12 @@
         </member>
         <member name="F:Abune.Shared.Message.FrameType.ServerHello">
             <summary>Server hello frame.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.ServerAuthenticationRequest">
+            <summary>The server authentication request.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.FrameType.ClientAuthenticationResponse">
+            <summary>The client authentication response.</summary>
         </member>
         <member name="F:Abune.Shared.Message.FrameType.ClientPing">
             <summary>Client ping request.</summary>
@@ -954,6 +997,24 @@
             <summary>Gets the message.</summary>
             <value>The message.</value>
         </member>
+        <member name="T:Abune.Shared.Message.ServerAuthenticationRequest">
+            <summary>Server authentication request.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerAuthenticationRequest.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ServerAuthenticationRequest" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerAuthenticationRequest.#ctor(System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.ServerAuthenticationRequest" /> class.</summary>
+            <param name="buffer">The buffer.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.ServerAuthenticationRequest.AuthenticationChallenge">
+            <summary>Gets or sets the welcome message.</summary>
+            <value>The message.</value>
+        </member>
+        <member name="M:Abune.Shared.Message.ServerAuthenticationRequest.Serialize">
+            <summary>Serializes this instance.</summary>
+            <returns>Byte serialized instance.</returns>
+        </member>
         <member name="T:Abune.Shared.Message.ServerHelloMessage">
             <summary>Server welcome message.</summary>
         </member>
@@ -966,6 +1027,10 @@
         </member>
         <member name="P:Abune.Shared.Message.ServerHelloMessage.Message">
             <summary>Gets or sets the welcome message.</summary>
+            <value>The message.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ServerHelloMessage.Version">
+            <summary>Gets or sets the server version.</summary>
             <value>The message.</value>
         </member>
         <member name="M:Abune.Shared.Message.ServerHelloMessage.Serialize">
@@ -1199,6 +1264,20 @@
             <param name="maxX">The maximum x boundary.</param>
             <param name="maxY">The maximum y boundary.</param>
             <param name="maxZ">The maximum z boundary.</param>
+        </member>
+        <member name="T:Abune.Shared.Util.OfflineTokenProvider">
+            <summary>Provides OAuth tokens in offline szenarios.</summary>
+        </member>
+        <member name="M:Abune.Shared.Util.OfflineTokenProvider.#ctor(System.String,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Util.OfflineTokenProvider" /> class.</summary>
+            <param name="issuer">The issuer.</param>
+            <param name="signingKey">The signing key.</param>
+        </member>
+        <member name="M:Abune.Shared.Util.OfflineTokenProvider.CreateJWTToken(System.String,System.DateTime)">
+            <summary>Creates the JWT token.</summary>
+            <param name="authenticationChallenge">The authentication challenge.</param>
+            <param name="expires">The expires.</param>
+            <returns>Json web token.</returns>
         </member>
         <member name="T:Abune.Shared.Util.ReliableUdpMessaging">
             <summary>Reliable udp messaging supporting QoS 0, 1 and 2.</summary>

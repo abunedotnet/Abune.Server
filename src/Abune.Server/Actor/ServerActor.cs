@@ -10,6 +10,7 @@ namespace Abune.Server.Actor
     using System.Collections.Generic;
     using System.Globalization;
     using System.Net;
+    using System.Security;
     using Abune.Server.Actor;
     using Abune.Server.Actor.Command;
     using Abune.Server.Actor.State;
@@ -20,6 +21,7 @@ namespace Abune.Server.Actor
     using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.IO;
+    using Akka.Pattern;
     using Newtonsoft.Json;
     using static Akka.IO.Udp;
 
@@ -30,19 +32,28 @@ namespace Abune.Server.Actor
         private IActorRef shardRegionObject;
         private IActorRef shardRegionArea;
         private IActorRef udpManagerActor;
+        private IActorRef authenticationActor;
         private ServerState state;
+        private IShardRegionResolver shardRegionResolver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerActor"/> class.
         /// </summary>
         /// <param name="shardCountArea">The shard count area.</param>
         /// <param name="shardCountObject">The shard count object.</param>
-        public ServerActor(int shardCountArea, int shardCountObject)
+        /// <param name="auth0Issuer">The auth0 issuer.</param>
+        /// <param name="auth0Audience">The auth0 audience.</param>
+        /// <param name="signingKey">The signing key.</param>
+        public ServerActor(int shardCountArea, int shardCountObject, string auth0Issuer, string auth0Audience, string signingKey)
         {
             this.state = new ServerState();
             this.state.ShardCountArea = shardCountArea;
             this.state.ShardCountObject = shardCountObject;
+            this.state.Auth0Issuer = auth0Issuer;
+            this.state.Auth0Audience = auth0Audience;
+            this.state.SigningKey = signingKey;
             this.udpManagerActor = Udp.Instance.Apply(Context.System).Manager;
+            this.authenticationActor = this.CreateAuthenticationActor();
             this.InitializeShardRegions(Context.System);
             this.Receive<StartServerMessage>(c =>
             {
@@ -85,12 +96,6 @@ namespace Abune.Server.Actor
             {
                 this.log.Error($"Failed command: {c.Cmd}");
             });
-        }
-
-        private static AreaActor CreateAreaActor()
-        {
-            var shardRegionObjects = ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION);
-            return new AreaActor(shardRegionObjects);
         }
 
         private static string GetClientTwinActorName(EndPoint endpoint)
@@ -141,7 +146,7 @@ namespace Abune.Server.Actor
                     throw new InvalidOperationException($"invalid endpoint type {clientEndPoint.GetType()}");
                 }
 
-                IActorRef clientTwinActor = Context.System.ActorOf(Props.Create(() => new ClientTwinActor(socketActorRef, clientReceiveEndPoint, ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.AREAREGION), ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION))), clientTwinActorName);
+                IActorRef clientTwinActor = Context.System.ActorOf(Props.Create(() => new ClientTwinActor(socketActorRef, this.authenticationActor, clientReceiveEndPoint, ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.AREAREGION), ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION))), clientTwinActorName);
                 Context.Watch(clientTwinActor);
                 this.state.ClientTwinActors.Add(clientTwinActorName, clientTwinActor);
                 return clientTwinActor;
@@ -158,8 +163,9 @@ namespace Abune.Server.Actor
 
         private void InitializeShardRegions(ActorSystem system)
         {
-            this.shardRegionObject = ClusterSharding.Get(system).Start(typeName: ShardRegions.OBJECTREGION, entityProps: Props.Create(() => new ObjectActor(this.shardRegionArea)), settings: ClusterShardingSettings.Create(system), messageExtractor: new ObjectRegionMessageExtractor(this.state.ShardCountObject));
-            this.shardRegionArea = ClusterSharding.Get(system).Start(typeName: ShardRegions.AREAREGION, entityProps: Props.Create(() => new AreaActor(this.shardRegionObject)), settings: ClusterShardingSettings.Create(system), messageExtractor: new AreaRegionMessageExtractor(this.state.ShardCountArea));
+            this.shardRegionResolver = new DefaultShardRegionResolver(ClusterSharding.Get(system));
+            this.shardRegionObject = ClusterSharding.Get(system).Start(typeName: ShardRegions.OBJECTREGION, entityProps: Props.Create(() => new ObjectActor(this.shardRegionResolver)), settings: ClusterShardingSettings.Create(system), messageExtractor: new ObjectRegionMessageExtractor(this.state.ShardCountObject));
+            this.shardRegionArea = ClusterSharding.Get(system).Start(typeName: ShardRegions.AREAREGION, entityProps: Props.Create(() => new AreaActor(this.shardRegionResolver)), settings: ClusterShardingSettings.Create(system), messageExtractor: new AreaRegionMessageExtractor(this.state.ShardCountArea));
         }
 
         private void RespondState(IActorRef replyTo)
@@ -197,6 +203,13 @@ namespace Abune.Server.Actor
             {
                 this.Sender.Tell(new Failure() { Exception = e });
             }
+        }
+
+        private IActorRef CreateAuthenticationActor()
+        {
+            // TODO SECURITY: throttle authentication actor with akka streams to suppress brute force attacks
+            Props childActor = Props.Create(() => new AuthenticationActor(this.state.Auth0Issuer, this.state.Auth0Audience, this.state.SigningKey));
+            return Context.ActorOf(Props.Create(() => new BackoffSupervisor(childActor, "Authentication", TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(60), 1.5)));
         }
     }
 }

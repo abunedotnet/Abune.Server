@@ -3,18 +3,21 @@
     using Abune.Server.Actor;
     using Abune.Server.Actor.Command;
     using Abune.Server.Command;
+    using Abune.Server.Sharding;
     using Abune.Server.Test.TestKit;
     using Abune.Shared.Command;
     using Abune.Shared.Message;
     using Abune.Shared.Util;
     using Akka.Actor;
     using Akka.TestKit;
+    using Moq;
     using System;
     using System.Globalization;
     using Xunit;
 
     public class ObjectActorSpec : AbuneSpec
     {
+        private Mock<IShardRegionResolver> shardRegionResolver;
         private IActorRef defaultShardRegionArea;
         private const ulong DEFAULTOBJECTID = 1234567890L;
         private const float DEFAULTPOSX = 10.0f;
@@ -24,13 +27,15 @@
         public ObjectActorSpec()
         {
             defaultShardRegionArea = CreateTestProbe();
+            shardRegionResolver = new Mock<IShardRegionResolver>();
+            shardRegionResolver.Setup(m => m.GetShardRegion(ShardRegions.AREAREGION)).Returns(defaultShardRegionArea);
         }
 
         [Fact]
         public void ActorMustStartAndStopOutsideShardRegion()
         {
             //setup
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(defaultShardRegionArea)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(shardRegionResolver.Object)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
             Watch(testeeRef);
 
             //execute
@@ -45,7 +50,7 @@
         {
             //setup
             var replyToProbe = CreateTestProbe();
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(defaultShardRegionArea)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(shardRegionResolver.Object)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
 
             //execute
             testeeRef.Tell(new RequestStateCommand(replyToProbe));
@@ -62,7 +67,9 @@
         {
             //setup
             var areRegionProbe = CreateTestProbe();
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(areRegionProbe)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
+            var localShardRegionResolver = new Mock<IShardRegionResolver>();
+            localShardRegionResolver.Setup(m => m.GetShardRegion(ShardRegions.AREAREGION)).Returns(areRegionProbe);
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(localShardRegionResolver.Object)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
             Watch(testeeRef);
 
             var cmdCreate = new ObjectCreateCommand(
@@ -290,7 +297,9 @@
         private IActorRef CreateDefaultObjectActor(TestProbe areaRegionProbe, float posX, float posY, float posZ)
         {
             //setup
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(areaRegionProbe)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
+            var localShardRegionResolver = new Mock<IShardRegionResolver>();
+            localShardRegionResolver.Setup(m => m.GetShardRegion(ShardRegions.AREAREGION)).Returns(areaRegionProbe);
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(localShardRegionResolver.Object)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
             Watch(testeeRef);
             var cmdCreate = new ObjectCreateCommand(
                 frameTick: 0,

@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
 	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
   <PropertyGroup>
-   <RuntimeFrameworkVersion>2.1.0</RuntimeFrameworkVersion>
+   <RuntimeFrameworkVersion>3.1.0</RuntimeFrameworkVersion>
    <PlatformTarget>AnyCPU</PlatformTarget>
  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -25,9 +25,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Abune.Server\Abune.Server.csproj" />
+    <ProjectReference Include="..\Abune.Shared\src\Abune.Shared.csproj" />
   </ItemGroup>
 
 </Project>

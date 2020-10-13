@@ -10,6 +10,9 @@
 
     public class ServerActorSpec : AbuneSpec
     {
+        private const string ISSUER = "self";
+        private const string AUDIENCE = "abuneserver";
+        private const string SIGNINGKEY = "!!!CHANGEME!!!";
         private const int DEFAULTAREACOUNT = 10;
         private const int DEFAULTOBJECTCOUNT = 10;
 
@@ -21,7 +24,7 @@
         [Fact]
         public void ActorMustStartAndStop()
         {
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ServerActor(DEFAULTAREACOUNT, DEFAULTOBJECTCOUNT)));
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ServerActor(DEFAULTAREACOUNT, DEFAULTOBJECTCOUNT, ISSUER, AUDIENCE, SIGNINGKEY)));
             Watch(testeeRef);
             Sys.Stop(testeeRef);
             ExpectTerminated(testeeRef);
@@ -32,7 +35,7 @@
         {
             var shardRegionObjectProbe = CreateTestProbe();
             var replyToProbe = CreateTestProbe();
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ServerActor(DEFAULTAREACOUNT, DEFAULTOBJECTCOUNT)));
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ServerActor(DEFAULTAREACOUNT, DEFAULTOBJECTCOUNT, ISSUER, AUDIENCE, SIGNINGKEY)));
             testeeRef.Tell(new RequestStateCommand(replyToProbe));
             replyToProbe.ExpectMsg<RespondStateCommand>(m =>
             {

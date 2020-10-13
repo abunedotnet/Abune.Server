@@ -32,6 +32,18 @@ namespace Abune.Server.Config
         /// <value>The shard count object.</value>
         public int ShardCountObject { get; set; } = 100;
 
+        /// <summary>Gets or sets the auth0 issuer.</summary>
+        /// <value>The auth0 issuer.</value>
+        public string Auth0Issuer { get; set; }
+
+        /// <summary>Gets or sets the auth0 audience.</summary>
+        /// <value>The auth0 audience.</value>
+        public string Auth0Audience { get; set; }
+
+        /// <summary>Gets or sets the signing key.</summary>
+        /// <value>The signing key.</value>
+        public string SigningKey { get; set; }
+
         /// <summary>Gets or sets the server udp port.</summary>
         /// <value>The server udp port.</value>
         public int ServerPort { get; set; } = 7777;

@@ -20,7 +20,7 @@ namespace Abune.Server.Cli
         {
             try
             {
-                if (args == null || args.Length < 1)
+                if (args == null || args.Length < 3)
                 {
                     throw new ArgumentOutOfRangeException(nameof(args));
                 }
