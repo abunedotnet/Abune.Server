@@ -15,6 +15,7 @@ namespace Abune.Server.Cli
     using Abune.Shared.Message;
     using Abune.Shared.Util;
     using Abune.Shared.Protocol;
+    using Abune.Server.Cli.Util;
 
     /// <summary>
     /// Abune CLI client.
