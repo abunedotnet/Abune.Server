@@ -138,16 +138,12 @@ namespace Abune.Server.Cli
             Dispose(true);
             GC.SuppressFinalize(this);            
         }
-        private static string GetAbuneSharedAssemblyVersion()
-        {
-            return typeof(ClientHelloMessage).Assembly.GetName().Version.ToString();
-        }
 
         /// <summary>Initializes the communication.</summary>
         /// <param name="clientPort">The client port.</param>
         private void InitializeCommunication(uint clientPort)
         {
-            var msgClientHello = new ClientHelloMessage() { ClientId = ClientId, ClientPort = clientPort, Message = $"Hello from {ClientId}", Version = GetAbuneSharedAssemblyVersion() };
+            var msgClientHello = new ClientHelloMessage() { ClientId = ClientId, ClientPort = clientPort, Message = $"Hello from {ClientId}", Version = Shared.Constants.Version.PROTOCOL };
             UdpTransferFrame frame = new UdpTransferFrame(FrameType.ClientHello, msgClientHello.Serialize());
             ReliableMessaging.OnSendFrame(frame);
         }

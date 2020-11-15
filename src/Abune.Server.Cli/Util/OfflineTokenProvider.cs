@@ -38,7 +38,7 @@ namespace Abune.Server.Cli.Util
             tokenDesciptor.Issuer = this.issuer;
             tokenDesciptor.IssuedAt = DateTime.UtcNow;
             tokenDesciptor.Subject = new System.Security.Claims.ClaimsIdentity();
-            tokenDesciptor.Subject.AddClaim(new System.Security.Claims.Claim(AuthenticationConstants.JwtClaims.AUTHENTICATIONCHALLENGE, authenticationChallenge));
+            tokenDesciptor.Subject.AddClaim(new System.Security.Claims.Claim(Shared.Constants.Auth.JwtClaims.AUTHENTICATIONCHALLENGE, authenticationChallenge));
             tokenDesciptor.Audience = "abune.server";
             tokenDesciptor.SigningCredentials = new SigningCredentials(this.signingKey, "HS256");
             tokenDesciptor.Expires = expires;

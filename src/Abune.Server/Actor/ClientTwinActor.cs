@@ -80,11 +80,6 @@ namespace Abune.Server.Actor
             }
         }
 
-        private static string GetAbuneSharedAssemblyVersion()
-        {
-            return typeof(ServerAuthenticationRequest).Assembly.GetName().Version.ToString();
-        }
-
         private static string BuildAuthenticationChallenge()
         {
             var random = new Random();
@@ -346,17 +341,16 @@ namespace Abune.Server.Actor
 
         private void WelcomeClient()
         {
-            string engineVersion = GetAbuneSharedAssemblyVersion();
-            if (this.state.ClientVersion != engineVersion)
+            if (this.state.ClientVersion != Shared.Constants.Version.PROTOCOL)
             {
-                var msgServerHelloFail = new ServerHelloMessage() { Message = $"FAIL: INVALID CLIENT VERSION '{this.state.ClientVersion}'", Version = GetAbuneSharedAssemblyVersion() };
+                var msgServerHelloFail = new ServerHelloMessage() { Message = $"FAIL: INVALID CLIENT VERSION '{this.state.ClientVersion}'", Version = Shared.Constants.Version.PROTOCOL };
                 this.log.Error($"[{this.state.ClientId}] invalid version: {this.state.ClientVersion}");
                 this.SendFrameToClient(FrameType.ServerHello, msgServerHelloFail.Serialize());
                 this.Self.Tell(PoisonPill.Instance);
                 return;
             }
 
-            var msgServerHello = new ServerHelloMessage() { Message = $"HELLO {this.state.ClientId}", Version = GetAbuneSharedAssemblyVersion() };
+            var msgServerHello = new ServerHelloMessage() { Message = $"HELLO {this.state.ClientId}", Version = Shared.Constants.Version.PROTOCOL };
             this.SendFrameToClient(FrameType.ServerHello, msgServerHello.Serialize());
         }
 

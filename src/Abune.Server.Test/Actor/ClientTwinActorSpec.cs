@@ -108,7 +108,7 @@
                 Message = string.Empty,
                 ClientId = CLIENTID,
                 ClientPort = 9999,
-                Version = typeof(ServerAuthenticationRequest).Assembly.GetName().Version.ToString(),
+                Version = Shared.Constants.Version.PROTOCOL,
             };
             var clientAuthenticationResponse = new ClientAuthenticationResponse()
             {

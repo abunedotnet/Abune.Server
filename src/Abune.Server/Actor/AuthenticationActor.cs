@@ -75,14 +75,13 @@ namespace Abune.Server.Actor
             /* To see detailed exception information:
              * Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
              */
-
             SecurityToken securityToken;
             try
             {
                 var claimsPrincipal = this.tokenHandler.ValidateToken(token, validationParameters, out securityToken);
-                if (!claimsPrincipal.HasClaim(m => m.Type == AuthenticationConstants.JwtClaims.AUTHENTICATIONCHALLENGE && m.Value == authenticationChallenge))
+                if (!claimsPrincipal.HasClaim(m => m.Type == Shared.Constants.Auth.JwtClaims.AUTHENTICATIONCHALLENGE && m.Value == authenticationChallenge))
                 {
-                    throw new InvalidOperationException(AuthenticationConstants.JwtClaims.AUTHENTICATIONCHALLENGE);
+                    throw new InvalidOperationException(Shared.Constants.Auth.JwtClaims.AUTHENTICATIONCHALLENGE);
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
