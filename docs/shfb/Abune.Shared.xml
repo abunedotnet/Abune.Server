@@ -1271,5 +1271,35 @@
             <summary>Gets or sets the message.</summary>
             <value>The message.</value>
         </member>
+        <member name="T:Assets.Abune.Client.Unity.Shared.Util.Base64Url">
+            <summary>
+            Helper class to support base 64 url encoding.
+            </summary>
+        </member>
+        <member name="M:Assets.Abune.Client.Unity.Shared.Util.Base64Url.Encode(System.Byte[])">
+            <summary>
+            Transforms byte array to a base 64 url encoded string.
+            </summary>
+            <param name="data">The input data.</param>
+            <returns>Base 64 url encoded data.</returns>
+        </member>
+        <member name="M:Assets.Abune.Client.Unity.Shared.Util.Base64Url.Decode(System.String)">
+            <summary>
+            Transforms base 64 url encoded string to byte array.
+            </summary>
+            <param name="data">The base 64 url encoded data.</param>
+            <returns>The byte array.</returns>
+        </member>
+        <member name="T:Assets.Abune.Client.Unity.Shared.Util.Contract.ITokenProvider">
+            <summary>
+            Interface for token provider.
+            </summary>
+        </member>
+        <member name="M:Assets.Abune.Client.Unity.Shared.Util.Contract.ITokenProvider.CreateJWTToken(System.String,System.DateTime)">
+            <summary>Creates the JWT token.</summary>
+            <param name="authenticationChallenge">The authentication challenge.</param>
+            <param name="expires">The expires.</param>
+            <returns>Json web token.</returns>
+        </member>
     </members>
 </doc>
