@@ -18,6 +18,7 @@ namespace Abune.Server.Cli.Commands
     using Abune.Shared.Protocol;
     using Abune.Shared.Util;
     using System.Globalization;
+    using Abune.Shared.DataType;
 
     /// <summary>Load test command implementation.</summary>
     public class LoadTest : BaseCliCommand
@@ -184,27 +185,30 @@ namespace Abune.Server.Cli.Commands
                 uint clientId = (uint)state;
 
                 CliClient client = new CliClient();
-                float locationX = clientId * Locator.AREASIZE;
-                float locationY = clientId * Locator.AREASIZE;
-                float locationZ = clientId * Locator.AREASIZE;
+                AVector3 location = new AVector3
+                {
+                    X = clientId * Locator.AREASIZE,
+                    Y = clientId * Locator.AREASIZE,
+                    Z = clientId * Locator.AREASIZE,
+                };
 
-                client.Connect(Host, Port, 0, TokenSigningKey, clientId, locationX, locationY, locationZ);
+                client.Connect(Host, Port, 0, TokenSigningKey, clientId, location);
                 AutoResetEvent eventFinished = new AutoResetEvent(false);
                 var statistics = new ClientStatistic();
                 statistics.ClientId = clientId;
                 client.ReliableMessaging.OnDeadLetter = (m) => statistics.DeadLetteredMessages++;
                 client.OnConnected = () =>
                 {
-                    ulong areaId = Locator.GetAreaIdFromWorldPosition(locationX, locationY, locationZ);
+                    ulong areaId = Locator.GetAreaIdFromWorldPosition(location);
 
                     _testCountdownEventStart.Signal();
                     _testCountdownEventStart.Wait();
 
-                    statistics.MessageStatistic.Add("CREATE", RunStatistics(client, qos, "Create objects", MessageCount, _ => new ObjectCreateCommand(0, _, 0, 0, 0, locationX, locationY, locationZ, 0, 0, 0, 0)));
+                    statistics.MessageStatistic.Add("CREATE", RunStatistics(client, qos, "Create objects", MessageCount, _ => new ObjectCreateCommand(0, _, 0, 0, 0, location, AQuaternion.Zero)));
                     _testCountdownEventCreated.Signal();
                     _testCountdownEventCreated.Wait();
 
-                    statistics.MessageStatistic.Add("UPDATE", RunStatistics(client, qos, "Update positions", MessageCount, _ => new ObjectUpdatePositionCommand(locationX, locationY, locationZ, 0, 0, 0, 0, 0, 0)));
+                    statistics.MessageStatistic.Add("UPDATE", RunStatistics(client, qos, "Update positions", MessageCount, _ => new ObjectUpdatePositionCommand(location, AQuaternion.Zero, AVector3.Zero, AVector3.Zero, 0, 0)));
                     _testCountdownEventUpdate.Signal();
                     _testCountdownEventUpdate.Wait();
 

@@ -4,21 +4,6 @@
         <name>Abune.Shared</name>
     </assembly>
     <members>
-        <member name="T:Abune.Shared.Command.AuthenticationConstants">
-            <summary>
-            Constants for authentication.
-            </summary>
-        </member>
-        <member name="T:Abune.Shared.Command.AuthenticationConstants.JwtClaims">
-            <summary>
-            Constants for jwt claims.
-            </summary>
-        </member>
-        <member name="F:Abune.Shared.Command.AuthenticationConstants.JwtClaims.AUTHENTICATIONCHALLENGE">
-            <summary>
-            The authentication challenge.
-            </summary>
-        </member>
         <member name="T:Abune.Shared.Command.BaseCommand">
             <summary>
             Base class for all commands.
@@ -76,6 +61,34 @@
             Serializes this instance into a binary writer.
             </summary>
             <param name="bw">Binary write to serialize to.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.ReadVector3(System.IO.BinaryReader)">
+            <summary>
+            Reads a vector 3 instance.
+            </summary>
+            <param name="reader">Binary reader on byte buffer.</param>
+            <returns>Vector.</returns>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.ReadQuaternion(System.IO.BinaryReader)">
+            <summary>
+            Reads a quaternion instance.
+            </summary>
+            <param name="reader">Binary reader on byte buffer.</param>
+            <returns>Quaternion.</returns>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.Write(System.IO.BinaryWriter,Abune.Shared.DataType.AVector3)">
+            <summary>
+            Writes a vector 3 instance.
+            </summary>
+            <param name="writer">Binary write to byte buffer.</param>
+            <param name="vector">Vector to write.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.Write(System.IO.BinaryWriter,Abune.Shared.DataType.AQuaternion)">
+            <summary>
+            Writes a vector 3 instance.
+            </summary>
+            <param name="bw">Binary write to byte buffer.</param>
+            <param name="quaternion">Quaternion to write.</param>
         </member>
         <member name="M:Abune.Shared.Command.BaseCommand.Deserialize(System.Byte[])">
             <summary>
@@ -139,47 +152,19 @@
             Deletes an object value.
             </summary>
         </member>
-        <member name="F:Abune.Shared.Command.CommandType.ObjectCollision">
-            <summary>
-            Object is colliding with object.
-            </summary>
-            <remarks>
-            For future use.
-            </remarks>
-        </member>
         <member name="T:Abune.Shared.Command.Contract.ICanAccelerate">
             <summary>
             Interface for things that could accelerate.
             </summary>
         </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.VelocityX">
+        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.Velocity">
             <summary>
-            Gets the velocity on x axis in units per second.
+            Gets the velocity in units per second.
             </summary>
         </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.VelocityY">
+        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.AngularVelocity">
             <summary>
-            Gets the velocity on y axis in units per second.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.VelocityZ">
-            <summary>
-            Gets the velocity on z axis in units per second.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.AngularVelocityX">
-            <summary>
-            Gets the angular velocity on x axis in radiants per second.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.AngularVelocityY">
-            <summary>
-            Gets the angular velocity on x axis in radiants per second.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanAccelerate.AngularVelocityZ">
-            <summary>
-            Gets the angular velocity on x axis in radiants per second.
+            Gets the angular velocity in radiants per second.
             </summary>
         </member>
         <member name="T:Abune.Shared.Command.Contract.ICanLocate">
@@ -187,90 +172,17 @@
             Interface for things that can be located.
             </summary>
         </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanLocate.WorldPositionX">
+        <member name="P:Abune.Shared.Command.Contract.ICanLocate.WorldPosition">
             <summary>
-            Gets the world position x axis.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanLocate.WorldPositionY">
-            <summary>
-            Gets the world position y axis.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanLocate.WorldPositionZ">
-            <summary>
-            Gets the world position z axis.
+            Gets the world position.
             </summary>
         </member>
         <member name="T:Abune.Shared.Command.Contract.ICanRotate">
             <summary>Implementation can rotate (Quaternion).</summary>
         </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanRotate.RotationW">
-            <summary>Gets the rotation w.</summary>
-            <value>The rotation w.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanRotate.RotationX">
-            <summary>Gets the rotation x.</summary>
-            <value>The rotation x.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanRotate.RotationY">
-            <summary>Gets the rotation y.</summary>
-            <value>The rotation y.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.Contract.ICanRotate.RotationZ">
-            <summary>Gets the rotation z.</summary>
-            <value>The rotation z.</value>
-        </member>
-        <member name="T:Abune.Shared.Command.ObjectCollisionCommand">
-            <summary>
-            Object collision command.
-            </summary>
-        </member>
-        <member name="M:Abune.Shared.Command.ObjectCollisionCommand.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCollisionCommand"/> class.
-            </summary>
-        </member>
-        <member name="M:Abune.Shared.Command.ObjectCollisionCommand.#ctor(Abune.Shared.Command.BaseCommand)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCollisionCommand"/> class.
-            </summary>
-            <param name="command">Unextracted base command.</param>
-        </member>
-        <member name="M:Abune.Shared.Command.ObjectCollisionCommand.#ctor(System.UInt64,System.UInt64,System.Single,System.Single,System.Single)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCollisionCommand"/> class.
-            </summary>
-            <param name="objectIdColliding">Id of object colliding.</param>
-            <param name="frameTick">Tick of the frame.</param>
-            <param name="impulseX">Impulse on x axis in units per second.</param>
-            <param name="impulseY">Impulse on y axis in units per second.</param>
-            <param name="impulseZ">Impulse on z axis in units per second.</param>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.ObjectIdColliding">
-            <summary>
-            Gets or sets the id of the colliding object.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.FrameTick">
-            <summary>
-            Gets or sets the tick of the frame.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.ImpulseX">
-            <summary>
-            Gets or sets impulse x axis in units per second.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.ImpulseY">
-            <summary>
-            Gets or sets impulse y axis in units per second.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCollisionCommand.ImpulseZ">
-            <summary>
-            Gets or sets impulse z axis in units per second.
-            </summary>
+        <member name="P:Abune.Shared.Command.Contract.ICanRotate.Orientation">
+            <summary>Gets the orientation.</summary>
+            <value>The orientation.</value>
         </member>
         <member name="T:Abune.Shared.Command.ObjectCreateCommand">
             <summary>
@@ -288,7 +200,7 @@
             </summary>
             <param name="command">Unextracted base command.</param>
         </member>
-        <member name="M:Abune.Shared.Command.ObjectCreateCommand.#ctor(System.UInt64,System.UInt64,System.UInt64,System.UInt32,System.UInt32,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+        <member name="M:Abune.Shared.Command.ObjectCreateCommand.#ctor(System.UInt64,System.UInt64,System.UInt64,System.UInt32,System.UInt32,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AQuaternion)">
             <summary>
             Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectCreateCommand"/> class.
             </summary>
@@ -297,13 +209,8 @@
             <param name="parentObjectId">Id of the objects parent.</param>
             <param name="ownerId">Id of the owner.</param>
             <param name="typeId">Type of the object.</param>
-            <param name="targetPositionX">Position x where object is located.</param>
-            <param name="targetPositionY">Position y where object is located.</param>
-            <param name="targetPositionZ">Position z where object is located.</param>
-            <param name="quaternionW">Quaternion direction w axis of object.</param>
-            <param name="quaternionX">Quaternion direction x axis of object.</param>
-            <param name="quaternionY">Quaternion direction y axis of object.</param>
-            <param name="quaternionZ">Quaternion direction z axis of object.</param>
+            <param name="targetPosition">Position where object is located.</param>
+            <param name="targetOrientation">Quaternion orientation of object.</param>
         </member>
         <member name="P:Abune.Shared.Command.ObjectCreateCommand.FrameTick">
             <summary>
@@ -330,74 +237,24 @@
             Gets or sets type of the object.
             </summary>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TargetPositionX">
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TargetPosition">
             <summary>
-            Gets or sets position x where object is located.
+            Gets or sets position where object is located.
             </summary>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TargetPositionY">
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TargetOrientation">
             <summary>
-            Gets or sets position y where object is located.
+            Gets or sets quaternion orientation of object.
             </summary>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.TargetPositionZ">
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPosition">
             <summary>
-            Gets or sets position z where object is located.
+            Gets position where object is located.
             </summary>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.QuaternionW">
-            <summary>
-            Gets or sets quaternion direction w axis of object.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.QuaternionX">
-            <summary>
-            Gets or sets quaternion direction x axis of object.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.QuaternionY">
-            <summary>
-            Gets or sets quaternion direction y axis of object.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.QuaternionZ">
-            <summary>
-            Gets or sets quaternion direction z axis of object.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionX">
-            <summary>
-            Gets position x where object is located.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionY">
-            <summary>
-            Gets position x where object is located.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionZ">
-            <summary>
-            Gets position x where object is located.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#RotationW">
+        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#Orientation">
             <summary>
             Gets quaternion direction w axis of object.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#RotationX">
-            <summary>
-            Gets quaternion direction x axis of object.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#RotationY">
-            <summary>
-            Gets quaternion direction y axis of object.
-            </summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectCreateCommand.Abune#Shared#Command#Contract#ICanRotate#RotationZ">
-            <summary>
-            Gets quaternion direction z axis of object.
             </summary>
         </member>
         <member name="T:Abune.Shared.Command.ObjectDestroyCommand">
@@ -414,13 +271,11 @@
             <exception cref="T:System.ArgumentNullException">Command argument.</exception>
             <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
         </member>
-        <member name="M:Abune.Shared.Command.ObjectDestroyCommand.#ctor(System.UInt64,System.UInt64,System.Single,System.Single,System.Single)">
+        <member name="M:Abune.Shared.Command.ObjectDestroyCommand.#ctor(System.UInt64,System.UInt64,Abune.Shared.DataType.AVector3)">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectDestroyCommand" /> class.</summary>
             <param name="frameTick">The frame tick.</param>
             <param name="objectId">The object identifier.</param>
-            <param name="targetPositionX">The target position x.</param>
-            <param name="targetPositionY">The target position y.</param>
-            <param name="targetPositionZ">The target position z.</param>
+            <param name="targetPosition">The target position.</param>
         </member>
         <member name="P:Abune.Shared.Command.ObjectDestroyCommand.FrameTick">
             <summary>Gets or sets the frame tick.</summary>
@@ -430,26 +285,12 @@
             <summary>Gets or sets the object identifier.</summary>
             <value>The object identifier.</value>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.TargetPositionX">
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.TargetPosition">
             <summary>Gets or sets the target position x.</summary>
             <value>The target position x.</value>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.TargetPositionY">
-            <summary>Gets or sets the target position y.</summary>
-            <value>The target position y.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.TargetPositionZ">
-            <summary>Gets or sets the target position z.</summary>
-            <value>The target position z.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.WorldPositionX">
+        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.WorldPosition">
             <summary>Gets the world position x axis.</summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.WorldPositionY">
-            <summary>Gets the world position y axis.</summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectDestroyCommand.WorldPositionZ">
-            <summary>Gets the world position z axis.</summary>
         </member>
         <member name="T:Abune.Shared.Command.ObjectLockCommand">
             <summary>Command to lock objects.</summary>
@@ -520,89 +361,37 @@
             <exception cref="T:System.ArgumentNullException">Command is null.</exception>
             <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
         </member>
-        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.UInt64,System.UInt64)">
+        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AQuaternion,System.UInt64,System.UInt64)">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUpdatePositionCommand" /> class.</summary>
-            <param name="targetPositionX">The target position x.</param>
-            <param name="targetPositionY">The target position y.</param>
-            <param name="targetPositionZ">The target position z.</param>
-            <param name="quaternionW">The quaternion w.</param>
-            <param name="quaternionX">The quaternion x.</param>
-            <param name="quaternionY">The quaternion y.</param>
-            <param name="quaternionZ">The quaternion z.</param>
+            <param name="targetPosition">The target position x.</param>
+            <param name="targetOrientation">The quaternion .</param>
             <param name="startFrameTick">The start frame tick.</param>
             <param name="stopFrameTick">The stop frame tick.</param>
         </member>
-        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.UInt64,System.UInt64)">
+        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AQuaternion,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3,System.UInt64,System.UInt64)">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUpdatePositionCommand" /> class.</summary>
-            <param name="targetPositionX">The target position x.</param>
-            <param name="targetPositionY">The target position y.</param>
-            <param name="targetPositionZ">The target position z.</param>
-            <param name="quaternionW">The quaternion w.</param>
-            <param name="quaternionX">The quaternion x.</param>
-            <param name="quaternionY">The quaternion y.</param>
-            <param name="quaternionZ">The quaternion z.</param>
-            <param name="velocityX">The velocity x.</param>
-            <param name="velocityY">The velocity y.</param>
-            <param name="velocityZ">The velocity z.</param>
-            <param name="angularVelocityX">The angular velocity x.</param>
-            <param name="angularVelocityY">The angular velocity y.</param>
-            <param name="angularVelocityZ">The angular velocity z.</param>
+            <param name="targetPosition">The target position.</param>
+            <param name="targetOrientation">The quaternion.</param>
+            <param name="velocity">The velocity.</param>
+            <param name="angularVelocity">The angular velocity.</param>
             <param name="startFrameTick">The start frame tick.</param>
             <param name="stopFrameTick">The stop frame tick.</param>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetPositionX">
-            <summary>Gets or sets the target position x.</summary>
-            <value>The target position x.</value>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetPosition">
+            <summary>Gets or sets the target position.</summary>
+            <value>The target position.</value>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetPositionY">
-            <summary>
-            Gets or sets the target position y.
-            </summary>
-            <value>The target position y.</value>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetOrientation">
+            <summary>Gets or sets the quaternion.</summary>
+            <value>The quaternion.</value>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetPositionZ">
-            <summary>Gets or sets the target position z.</summary>
-            <value>The target position z.</value>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Velocity">
+            <summary>Gets or sets the velocity.</summary>
+            <value>The velocity.</value>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.QuaternionW">
-            <summary>Gets or sets the quaternion w.</summary>
-            <value>The quaternion w.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.QuaternionX">
-            <summary>Gets or sets the quaternion x.</summary>
-            <value>The quaternion x.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.QuaternionY">
-            <summary>Gets or sets the quaternion y.</summary>
-            <value>The quaternion y.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.QuaternionZ">
-            <summary>Gets or sets the quaternion z.</summary>
-            <value>The quaternion z.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.VelocityX">
-            <summary>Gets or sets the velocity x.</summary>
-            <value>The velocity x.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.VelocityY">
-            <summary>Gets or sets the velocity y.</summary>
-            <value>The velocity y.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.VelocityZ">
-            <summary>Gets or sets the velocity z.</summary>
-            <value>The velocity z.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.AngularVelocityX">
-            <summary>Gets or sets the angular velocity x.</summary>
-            <value>The angular velocity x.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.AngularVelocityY">
-            <summary>Gets or sets the angular velocity y.</summary>
-            <value>The angular velocity y.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.AngularVelocityZ">
-            <summary>Gets or sets the angular velocity z.</summary>
-            <value>The angular velocity z.</value>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.AngularVelocity">
+            <summary>Gets or sets the angular velocity.</summary>
+            <value>The angular velocity.</value>
         </member>
         <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.StartFrameTick">
             <summary>Gets or sets the start frame tick.</summary>
@@ -612,50 +401,18 @@
             <summary>Gets or sets the stop frame tick.</summary>
             <value>The stop frame tick.</value>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionX">
-            <summary>Gets the world position x axis.</summary>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPosition">
+            <summary>Gets the world position.</summary>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionY">
-            <summary>Gets the world position y axis.</summary>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#Orientation">
+            <summary>Gets the rotation.</summary>
+            <value>The rotation.</value>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPositionZ">
-            <summary>
-            Gets the world position z axis.
-            </summary>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#Velocity">
+            <summary>Gets the velocity in units per second.</summary>
         </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#RotationW">
-            <summary>Gets the rotation w.</summary>
-            <value>The rotation w.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#RotationX">
-            <summary>Gets the rotation x.</summary>
-            <value>The rotation x.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#RotationY">
-            <summary>Gets the rotation y.</summary>
-            <value>The rotation y.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanRotate#RotationZ">
-            <summary>Gets the rotation z.</summary>
-            <value>The rotation z.</value>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#VelocityX">
-            <summary>Gets the velocity on x axis in units per second.</summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#VelocityY">
-            <summary>Gets the velocity on y axis in units per second.</summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#VelocityZ">
-            <summary>Gets the velocity on z axis in units per second.</summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#AngularVelocityX">
-            <summary>Gets the angular velocity on x axis in radiants per second.</summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#AngularVelocityY">
-            <summary>Gets the angular velocity on x axis in radiants per second.</summary>
-        </member>
-        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#AngularVelocityZ">
-            <summary>Gets the angular velocity on x axis in radiants per second.</summary>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.Abune#Shared#Command#Contract#ICanAccelerate#AngularVelocity">
+            <summary>Gets the angular velocity radiants per second.</summary>
         </member>
         <member name="T:Abune.Shared.Command.ObjectValueRemoveCommand">
             <summary>Remove value from object command.</summary>
@@ -771,6 +528,170 @@
         <member name="P:Abune.Shared.Command.UnsubscribeAreaCommand.AreaId">
             <summary>Gets the area identifier.</summary>
             <value>The area identifier.</value>
+        </member>
+        <member name="T:Abune.Shared.Constants.Auth">
+            <summary>
+            Constants for authentication.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Constants.Auth.JwtClaims">
+            <summary>
+            Constants for jwt claims.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Constants.Auth.JwtClaims.AUTHENTICATIONCHALLENGE">
+            <summary>
+            The authentication challenge.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Constants.Version">
+            <summary>
+            Constants for version information.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Constants.Version.PROTOCOL">
+            <summary>
+            The protocol version.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.DataType.AQuaternion">
+            <summary>
+            Class representing an orientation.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AQuaternion.Zero">
+            <summary>
+            Gets zero initialized quaternion.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AQuaternion.X">
+            <summary>
+            Gets or sets the X component of the Quaternion.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AQuaternion.Y">
+            <summary>
+            Gets or sets the Y component of the Quaternion.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AQuaternion.Z">
+            <summary>
+            Gets or sets the Z component of the Quaternion.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AQuaternion.W">
+            <summary>
+            Gets or sets the W component of the Quaternion.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.DataType.AQuaternion.op_Equality(Abune.Shared.DataType.AQuaternion,Abune.Shared.DataType.AQuaternion)">
+            <summary>
+            Compares two quaternions.
+            </summary>
+            <param name="left">Left quaternion.</param>
+            <param name="right">Right quaternion.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AQuaternion.op_Inequality(Abune.Shared.DataType.AQuaternion,Abune.Shared.DataType.AQuaternion)">
+            <summary>
+            Compares two quaternions.
+            </summary>
+            <param name="left">Left quaternion.</param>
+            <param name="right">Right quaternion.</param>
+            <returns>false if the specified object is equal to the current object; otherwise, true.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AQuaternion.Equals(Abune.Shared.DataType.AQuaternion)">
+            <summary>
+            Determines whether two object instances are equal.
+            </summary>
+            <param name="other">The object to compare with the current object.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AQuaternion.Equals(System.Object)">
+            <summary>
+            Determines whether two object instances are equal.
+            </summary>
+            <param name="obj">The object to compare with the current object.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AQuaternion.GetHashCode">
+            <summary>
+            Serves as the default hash function.
+            </summary>
+            <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AQuaternion.ToString">
+            <summary>
+             Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Abune.Shared.DataType.AVector3">
+            <summary>
+            Struct representing a three dimensional vector.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AVector3.Zero">
+            <summary>
+            Gets zero initialized vector.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AVector3.X">
+            <summary>
+            Gets or sets the X component of the vector.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AVector3.Y">
+            <summary>
+            Gets or sets the Y component of the vector.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.DataType.AVector3.Z">
+            <summary>
+            Gets or sets the Z component of the vector.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.DataType.AVector3.op_Equality(Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3)">
+            <summary>
+            Compares two vectors.
+            </summary>
+            <param name="left">Left vector.</param>
+            <param name="right">Right vector.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AVector3.op_Inequality(Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3)">
+            <summary>
+            Compares two vectors.
+            </summary>
+            <param name="left">Left vector.</param>
+            <param name="right">Right vector.</param>
+            <returns>false if the specified object is equal to the current object; otherwise, true.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AVector3.ToString">
+            <summary>
+             Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AVector3.Equals(Abune.Shared.DataType.AVector3)">
+            <summary>
+            Determines whether two object instances are equal.
+            </summary>
+            <param name="other">The object to compare with the current object.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AVector3.Equals(System.Object)">
+            <summary>
+            Determines whether two object instances are equal.
+            </summary>
+            <param name="obj">The object to compare with the current object.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Abune.Shared.DataType.AVector3.GetHashCode">
+            <summary>
+            Serves as the default hash function.
+            </summary>
+            <returns>A hash code for the current object.</returns>
         </member>
         <member name="T:Abune.Shared.Message.AreaCommandEnvelope">
             <summary>Envelope for area commands.</summary>
@@ -1238,21 +1159,15 @@
         <member name="F:Abune.Shared.Util.Locator.MAXPOSITION">
             <summary>  The absolute maximum position an object can have.</summary>
         </member>
-        <member name="M:Abune.Shared.Util.Locator.GetAreaIdFromWorldPosition(System.Single,System.Single,System.Single)">
+        <member name="M:Abune.Shared.Util.Locator.GetAreaIdFromWorldPosition(Abune.Shared.DataType.AVector3)">
             <summary>Gets the area identifier from world position.</summary>
-            <param name="x">The x position.</param>
-            <param name="y">The y position.</param>
-            <param name="z">The z position.</param>
+            <param name="worldPosition">The world position.</param>
             <returns>The area identifier.</returns>
         </member>
-        <member name="M:Abune.Shared.Util.Locator.GetAreaIdsWithinWorldBoundaries(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+        <member name="M:Abune.Shared.Util.Locator.GetAreaIdsWithinWorldBoundaries(Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3)">
             <summary>Gets all area identifiers within the given world boundaries.</summary>
-            <param name="minX">The minimum x position.</param>
-            <param name="minY">The minimum y position.</param>
-            <param name="minZ">The minimum z position.</param>
-            <param name="maxX">The maximum x position.</param>
-            <param name="maxY">The maximum y position.</param>
-            <param name="maxZ">The maximum z position.</param>
+            <param name="min">The minimum world position.</param>
+            <param name="max">The maximum world  position.</param>
             <returns>List of area identifiers.</returns>
         </member>
         <member name="M:Abune.Shared.Util.Locator.GetAreaBoundary(System.UInt64,System.Single@,System.Single@,System.Single@,System.Single@,System.Single@,System.Single@)">
@@ -1264,20 +1179,6 @@
             <param name="maxX">The maximum x boundary.</param>
             <param name="maxY">The maximum y boundary.</param>
             <param name="maxZ">The maximum z boundary.</param>
-        </member>
-        <member name="T:Abune.Shared.Util.OfflineTokenProvider">
-            <summary>Provides OAuth tokens in offline szenarios.</summary>
-        </member>
-        <member name="M:Abune.Shared.Util.OfflineTokenProvider.#ctor(System.String,System.String)">
-            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Util.OfflineTokenProvider" /> class.</summary>
-            <param name="issuer">The issuer.</param>
-            <param name="signingKey">The signing key.</param>
-        </member>
-        <member name="M:Abune.Shared.Util.OfflineTokenProvider.CreateJWTToken(System.String,System.DateTime)">
-            <summary>Creates the JWT token.</summary>
-            <param name="authenticationChallenge">The authentication challenge.</param>
-            <param name="expires">The expires.</param>
-            <returns>Json web token.</returns>
         </member>
         <member name="T:Abune.Shared.Util.ReliableUdpMessaging">
             <summary>Reliable udp messaging supporting QoS 0, 1 and 2.</summary>

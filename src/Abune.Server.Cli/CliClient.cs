@@ -16,6 +16,7 @@ namespace Abune.Server.Cli
     using Abune.Shared.Util;
     using Abune.Shared.Protocol;
     using Abune.Server.Cli.Util;
+    using Abune.Shared.DataType;
 
     /// <summary>
     /// Abune CLI client.
@@ -26,7 +27,7 @@ namespace Abune.Server.Cli
         private UdpClient client;
         private IPEndPoint localEndPoint;
         private IPEndPoint serverEndPoint;
-        private float locationX, locationY, locationZ;
+        private AVector3 location;
         private string signingKeyBase64;
 
         /// <summary>Gets or sets the client identifier.</summary>
@@ -68,14 +69,10 @@ namespace Abune.Server.Cli
         /// <param name="clientPort">The client port.</param>
         /// <param name="signingKeyBase64">Signing key for token generation.</param>
         /// <param name="clientId">The client identifier.</param>
-        /// <param name="locationX">The location x.</param>
-        /// <param name="locationY">The location y.</param>
-        /// <param name="locationZ">The location z.</param>
-        public void Connect(string serverEndpoint, int serverPort, int clientPort, string signingKeyBase64, uint clientId, float locationX, float locationY, float locationZ)
+        /// <param name="location">The location.</param>
+        public void Connect(string serverEndpoint, int serverPort, int clientPort, string signingKeyBase64, uint clientId, AVector3 location)
         {
-            this.locationX = locationX;
-            this.locationY = locationY;
-            this.locationZ = locationZ;
+            this.location = location;
             this.ClientId = clientId;
             this.signingKeyBase64 = signingKeyBase64;
             if (this.ClientId == 0)
@@ -171,7 +168,7 @@ namespace Abune.Server.Cli
         /// <summary>Subscribes to default area.</summary>
         private void SubscribeToDefaultArea()
         {
-            ulong areaId = Locator.GetAreaIdFromWorldPosition(locationX, locationY, locationZ);
+            ulong areaId = Locator.GetAreaIdFromWorldPosition(location);
             ReliableMessaging.SendCommand(0, new SubscribeAreaCommand(ClientId, areaId, 0), 0);
         }
 

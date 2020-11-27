@@ -243,11 +243,6 @@ namespace Abune.Server.Actor
                         parsedCommand = cmdUnsubscribeArea;
                         this.shardRegionArea.Tell(new AreaCommandEnvelope(cmdUnsubscribeArea.AreaId, new ObjectCommandEnvelope(0, cmdUnsubscribeArea, 0)));
                         break;
-                    case CommandType.ObjectCollision:
-                        var cmdCollision = new ObjectCollisionCommand(cmdMsg.Command);
-                        parsedCommand = cmdCollision;
-                        this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmdCollision, cmdMsg.ToObjectId));
-                        break;
                     case CommandType.ObjectUpdatePosition:
                         var cmdUpdatePosition = new ObjectUpdatePositionCommand(cmdMsg.Command);
                         parsedCommand = cmdUpdatePosition;

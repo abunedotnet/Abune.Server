@@ -6,6 +6,7 @@
     using Abune.Server.Sharding;
     using Abune.Server.Test.TestKit;
     using Abune.Shared.Command;
+    using Abune.Shared.DataType;
     using Abune.Shared.Message;
     using Abune.Shared.Util;
     using Akka.Actor;
@@ -20,9 +21,12 @@
         private Mock<IShardRegionResolver> shardRegionResolver;
         private IActorRef defaultShardRegionArea;
         private const ulong DEFAULTOBJECTID = 1234567890L;
-        private const float DEFAULTPOSX = 10.0f;
-        private const float DEFAULTPOSY = 20.0f;
-        private const float DEFAULTPOSZ = 30.0f;
+        private readonly AVector3 DEFAULTVECTOR = new AVector3
+        {
+            X = 10.0f,
+            Y = 20.0f,
+            Z = 30.0f
+        };
 
         public ObjectActorSpec()
         {
@@ -78,21 +82,28 @@
                 parentObjectId: 0,
                 ownerId: 0,
                 typeId: 0,
-                targetPositionX: 10.0f,
-                targetPositionY: 20.0f,
-                targetPositionZ: 30.0f,
-                quaternionX: 40.0f,
-                quaternionY: 50.0f,
-                quaternionZ: 60.0f,
-                quaternionW: 70.0f);
+                targetPosition: new AVector3 {
+                    X = 10.0f,
+                    Y = 20.0f,
+                    Z = 30.0f,
+                },
+                targetOrientation: new AQuaternion {
+                    X = 40.0f,
+                    Y = 50.0f,
+                    Z = 60.0f,
+                    W = 70.0f,
+                });
             var cmdEnvCreate = new ObjectCommandEnvelope(0, cmdCreate, DEFAULTOBJECTID);
 
             var cmdDestroy = new ObjectDestroyCommand(
                 frameTick: 0,
                 objectId: DEFAULTOBJECTID,
-                targetPositionX: 10.0f,
-                targetPositionY: 20.0f,
-                targetPositionZ: 30.0f);
+                targetPosition: new AVector3
+                {
+                    X = 10.0f,
+                    Y = 20.0f,
+                    Z = 30.0f
+                });
             var cmdEnvDestroy = new ObjectCommandEnvelope(0, cmdDestroy, DEFAULTOBJECTID);
 
             //execute
@@ -101,13 +112,13 @@
             //verify - object enters area
             areRegionProbe.ExpectMsg<ObjectEnterAreaCommand>(m => {
                 Assert.Equal(DEFAULTOBJECTID, m.ObjectId);
-                Assert.Equal(Locator.GetAreaIdFromWorldPosition(cmdCreate.TargetPositionX, cmdCreate.TargetPositionY, cmdCreate.TargetPositionZ), m.AreaId);
+                Assert.Equal(Locator.GetAreaIdFromWorldPosition(cmdCreate.TargetPosition), m.AreaId);
             });
 
             //create reaches area subscribers 
             areRegionProbe.ExpectMsg<AreaCommandEnvelope>(m =>
             {
-                Assert.Equal(Locator.GetAreaIdFromWorldPosition(cmdCreate.TargetPositionX, cmdCreate.TargetPositionY, cmdCreate.TargetPositionZ), m.ToAreaId);
+                Assert.Equal(Locator.GetAreaIdFromWorldPosition(cmdCreate.TargetPosition), m.ToAreaId);
                 Assert.Equal(CommandType.ObjectCreate, m.ObjectCommandEnvelope.Command.Type);
             });
 
@@ -117,13 +128,13 @@
             //verify - object leaves area
             areRegionProbe.ExpectMsg<ObjectLeaveAreaCommand>(m => {
                 Assert.Equal(DEFAULTOBJECTID, m.ObjectId);
-                Assert.Equal(Locator.GetAreaIdFromWorldPosition(cmdDestroy.TargetPositionX, cmdDestroy.TargetPositionY, cmdDestroy.TargetPositionZ), m.AreaId);
+                Assert.Equal(Locator.GetAreaIdFromWorldPosition(cmdDestroy.TargetPosition), m.AreaId);
             });
 
             //verify - destroy reaches area subscribers 
             areRegionProbe.ExpectMsg<AreaCommandEnvelope>(m =>
             {
-                Assert.Equal(Locator.GetAreaIdFromWorldPosition(cmdCreate.TargetPositionX, cmdCreate.TargetPositionY, cmdCreate.TargetPositionZ), m.ToAreaId);
+                Assert.Equal(Locator.GetAreaIdFromWorldPosition(cmdCreate.TargetPosition), m.ToAreaId);
                 Assert.Equal(CommandType.ObjectDestroy, m.ObjectCommandEnvelope.Command.Type);
             });
             ExpectTerminated(testeeRef);
@@ -140,19 +151,25 @@
             float newPosZ = 5000.0f;
 
             var cmdUpdatePosition = new ObjectUpdatePositionCommand(                
-                targetPositionX: newPosX,
-                targetPositionY: newPosY,
-                targetPositionZ: newPosZ,
-                quaternionX: 40.0f,
-                quaternionY: 50.0f,
-                quaternionZ: 60.0f,
-                quaternionW: 70.0f,
+                targetPosition: new AVector3
+                {
+                    X = newPosX,
+                    Y = newPosY,
+                    Z = newPosZ
+                },
+                targetOrientation: new AQuaternion
+                {
+                    X = 40.0f,
+                    Y = 50.0f,
+                    Z = 60.0f,
+                    W = 70.0f
+                },
                 startFrameTick: 0,
                 stopFrameTick: 0
                 );
             var cmdEnvUpdatePosition = new ObjectCommandEnvelope(0, cmdUpdatePosition, DEFAULTOBJECTID);
-            var expectedOldAreaId = Locator.GetAreaIdFromWorldPosition(DEFAULTPOSX, DEFAULTPOSY, DEFAULTPOSZ);
-            var expectedNewAreaId = Locator.GetAreaIdFromWorldPosition(cmdUpdatePosition.TargetPositionX, cmdUpdatePosition.TargetPositionY, cmdUpdatePosition.TargetPositionZ);
+            var expectedOldAreaId = Locator.GetAreaIdFromWorldPosition(DEFAULTVECTOR);
+            var expectedNewAreaId = Locator.GetAreaIdFromWorldPosition(cmdUpdatePosition.TargetPosition);
 
             //execute
             testeeRef.Tell(cmdEnvUpdatePosition);
@@ -202,13 +219,19 @@
             var cmdEnvLock = new ObjectCommandEnvelope(LOCKOWNER, cmdLock, DEFAULTOBJECTID);
 
             var cmdUpdatePosition = new ObjectUpdatePositionCommand(
-                targetPositionX: 10.0f,
-                targetPositionY: 20.0f,
-                targetPositionZ: 30.0f,
-                quaternionX: 40.0f,
-                quaternionY: 50.0f,
-                quaternionZ: 60.0f,
-                quaternionW: 70.0f,
+                targetPosition: new AVector3
+                {
+                    X = 10.0f,
+                    Y = 20.0f,
+                    Z = 30.0f,
+                },
+                targetOrientation: new AQuaternion
+                {
+                    X = 40.0f,
+                    Y = 50.0f,
+                    Z = 60.0f,
+                    W = 70.0f,
+                },
                 startFrameTick: 0,
                 stopFrameTick: 0
                 );
@@ -221,7 +244,7 @@
             areaRegionProbe.ExpectMsg<AreaCommandEnvelope>(m =>
             {
                 Assert.Equal(CommandType.ObjectLock, m.ObjectCommandEnvelope.Command.Type);
-                Assert.Equal(Locator.GetAreaIdFromWorldPosition(DEFAULTPOSX, DEFAULTPOSY, DEFAULTPOSZ), m.ToAreaId);
+                Assert.Equal(Locator.GetAreaIdFromWorldPosition(DEFAULTVECTOR), m.ToAreaId);
             });
 
             //execute
@@ -246,13 +269,18 @@
             var cmdEnvLock = new ObjectCommandEnvelope(LOCKOWNER, cmdLock, DEFAULTOBJECTID);
 
             var cmdUpdatePosition = new ObjectUpdatePositionCommand(
-                targetPositionX: 10.0f,
-                targetPositionY: 20.0f,
-                targetPositionZ: 30.0f,
-                quaternionX: 40.0f,
-                quaternionY: 50.0f,
-                quaternionZ: 60.0f,
-                quaternionW: 70.0f,
+                targetPosition: new AVector3
+                {
+                    X = 10.0f,
+                    Y = 20.0f,
+                    Z = 30.0f,
+                },
+                targetOrientation: new AQuaternion {
+                    X = 40.0f,
+                    Y = 50.0f,
+                    Z = 60.0f,
+                    W = 70.0f,
+                },
                 startFrameTick: 0,
                 stopFrameTick: 0
                 );
@@ -265,7 +293,7 @@
             areaRegionProbe.ExpectMsg<AreaCommandEnvelope>(m =>
             {
                 Assert.Equal(CommandType.ObjectLock, m.ObjectCommandEnvelope.Command.Type);
-                Assert.Equal(Locator.GetAreaIdFromWorldPosition(DEFAULTPOSX, DEFAULTPOSY, DEFAULTPOSZ), m.ToAreaId);
+                Assert.Equal(Locator.GetAreaIdFromWorldPosition(DEFAULTVECTOR), m.ToAreaId);
             });
 
             //execute
@@ -275,7 +303,7 @@
             areaRegionProbe.ExpectMsg<AreaCommandEnvelope>(m =>
             {
                 Assert.Equal(CommandType.ObjectUnlock, m.ObjectCommandEnvelope.Command.Type);
-                Assert.Equal(Locator.GetAreaIdFromWorldPosition(DEFAULTPOSX, DEFAULTPOSY, DEFAULTPOSZ), m.ToAreaId);
+                Assert.Equal(Locator.GetAreaIdFromWorldPosition(DEFAULTVECTOR), m.ToAreaId);
             });
 
             //execute
@@ -285,16 +313,16 @@
             areaRegionProbe.ExpectMsg<AreaCommandEnvelope>(m =>
             {
                 Assert.Equal(CommandType.ObjectUpdatePosition, m.ObjectCommandEnvelope.Command.Type);
-                Assert.Equal(Locator.GetAreaIdFromWorldPosition(DEFAULTPOSX, DEFAULTPOSY, DEFAULTPOSZ), m.ToAreaId);
+                Assert.Equal(Locator.GetAreaIdFromWorldPosition(DEFAULTVECTOR), m.ToAreaId);
             });
         }
 
         private IActorRef CreateDefaultObjectActor(TestProbe areaRegionProbe)
         {
-            return CreateDefaultObjectActor(areaRegionProbe, DEFAULTPOSX, DEFAULTPOSY, DEFAULTPOSZ);
+            return CreateDefaultObjectActor(areaRegionProbe, DEFAULTVECTOR);
         }
 
-        private IActorRef CreateDefaultObjectActor(TestProbe areaRegionProbe, float posX, float posY, float posZ)
+        private IActorRef CreateDefaultObjectActor(TestProbe areaRegionProbe, AVector3 pos)
         {
             //setup
             var localShardRegionResolver = new Mock<IShardRegionResolver>();
@@ -307,13 +335,14 @@
                 parentObjectId: 0,
                 ownerId: 0,
                 typeId: 0,
-                targetPositionX: posX,
-                targetPositionY: posY,
-                targetPositionZ: posZ,
-                quaternionX: 40.0f,
-                quaternionY: 50.0f,
-                quaternionZ: 60.0f,
-                quaternionW: 70.0f);
+                targetPosition: pos,
+                targetOrientation: new AQuaternion
+                {
+                    X = 40.0f,
+                    Y = 50.0f,
+                    Z = 60.0f,
+                    W = 70.0f
+                });
             var cmdEnvCreate = new ObjectCommandEnvelope(0, cmdCreate, DEFAULTOBJECTID);
 
             //execute

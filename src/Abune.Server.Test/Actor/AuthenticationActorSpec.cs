@@ -38,7 +38,7 @@
             {
                 AuthenticationChallenge = "140.82.121.3:50789|12131231241231",
                 ReplyTo = replyToProbe,
-                Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwiaXNzIjoiand0LmlvIiwiYXVkIjoiYWJ1bmUuc2VydmVyIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE4OTM0NTYwMDAsImFidW5lLmNobGciOiIxNDAuODIuMTIxLjM6NTA3ODl8MTIxMzEyMzEyNDEyMzEifQ.mcwfi9K45gKl3LwUDgptIreFHB4qXACcX-Q1BUKQW7s",
+                Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwiaXNzIjoiand0LmlvIiwiYXVkIjoiYWJ1bmUuc2VydmVyIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE4OTM0NTYwMDAsImFibmNoIjoiMTQwLjgyLjEyMS4zOjUwNzg5fDEyMTMxMjMxMjQxMjMxIn0.aFgb03OyqVlG5ri9zqqPMgT4GT0xGx54Ah8IVYHy0M8",
             });
             replyToProbe.ExpectMsg<AuthenticationSuccess>(m =>
             {

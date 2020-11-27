@@ -93,9 +93,6 @@ namespace Abune.Server.Actor
                 this.state.TimeStampLastCommand = DateTime.UtcNow;
                 switch (objCmd.Command.Type)
                 {
-                    case CommandType.ObjectCollision:
-                        this.ForwardToArea(objCmd);
-                        break;
                     case CommandType.ObjectUpdatePosition:
                         this.UpdateStatePersistent(new ObjectUpdatePositionCommand(objCmd.Command), (cmd) => this.ForwardToArea(objCmd));
                         break;
@@ -107,11 +104,11 @@ namespace Abune.Server.Actor
                         break;
                     case CommandType.ObjectCreate:
                         ObjectCreateCommand createCmd = new ObjectCreateCommand(objCmd.Command);
-                        this.NotifyEnterArea(senderId, Locator.GetAreaIdFromWorldPosition(this.state.WorldPositionX, this.state.WorldPositionY, this.state.WorldPositionZ));
+                        this.NotifyEnterArea(senderId, Locator.GetAreaIdFromWorldPosition(this.state.WorldPosition));
                         this.UpdateStatePersistent(createCmd, (cmd) => this.ForwardToArea(objCmd));
                         break;
                     case CommandType.ObjectDestroy:
-                        this.NotifyLeaveArea(Locator.GetAreaIdFromWorldPosition(this.state.WorldPositionX, this.state.WorldPositionY, this.state.WorldPositionZ));
+                        this.NotifyLeaveArea(Locator.GetAreaIdFromWorldPosition(this.state.WorldPosition));
                         this.ForwardToArea(objCmd);
                         this.Self.Tell(PoisonPill.Instance);
                         this.DeleteMessages(this.LastSequenceNr);
@@ -217,32 +214,21 @@ namespace Abune.Server.Actor
             if (command is ICanLocate)
             {
                 var canLocate = (ICanLocate)command;
-                this.state.LastWorldPositionX = this.state.WorldPositionX;
-                this.state.LastWorldPositionY = this.state.WorldPositionY;
-                this.state.LastWorldPositionZ = this.state.WorldPositionZ;
-                this.state.WorldPositionX = canLocate.WorldPositionX;
-                this.state.WorldPositionY = canLocate.WorldPositionY;
-                this.state.WorldPositionZ = canLocate.WorldPositionZ;
+                this.state.LastWorldPosition = this.state.WorldPosition;
+                this.state.WorldPosition = canLocate.WorldPosition;
             }
 
             if (command is ICanRotate)
             {
                 var canRotate = (ICanRotate)command;
-                this.state.QuaternionX = canRotate.RotationX;
-                this.state.QuaternionY = canRotate.RotationY;
-                this.state.QuaternionZ = canRotate.RotationZ;
-                this.state.QuaternionW = canRotate.RotationW;
+                this.state.WorldOrientation = canRotate.Orientation;
             }
 
             if (command is ICanAccelerate)
             {
                 var canAccelerate = (ICanAccelerate)command;
-                this.state.VelocityX = canAccelerate.VelocityX;
-                this.state.VelocityY = canAccelerate.VelocityY;
-                this.state.VelocityZ = canAccelerate.VelocityZ;
-                this.state.AngularVelocityX = canAccelerate.AngularVelocityX;
-                this.state.AngularVelocityY = canAccelerate.AngularVelocityY;
-                this.state.AngularVelocityZ = canAccelerate.AngularVelocityZ;
+                this.state.Velocity = canAccelerate.Velocity;
+                this.state.AngularVelocity = canAccelerate.AngularVelocity;
             }
 
             switch (command.Type)
@@ -261,9 +247,7 @@ namespace Abune.Server.Actor
                     this.state.ParentObjectId = createCmd.ParentObjectId;
                     this.state.OwnerId = createCmd.OwnerId;
                     this.state.TypeId = createCmd.TypeId;
-                    this.state.LastWorldPositionX = this.state.WorldPositionX;
-                    this.state.LastWorldPositionY = this.state.WorldPositionY;
-                    this.state.LastWorldPositionZ = this.state.WorldPositionZ;
+                    this.state.LastWorldPosition = this.state.WorldPosition;
                     this.isInitialized = true;
                     break;
                 case CommandType.ObjectDestroy:
@@ -303,8 +287,8 @@ namespace Abune.Server.Actor
                 return;
             }
 
-            ulong oldAreaId = Locator.GetAreaIdFromWorldPosition(this.state.LastWorldPositionX, this.state.LastWorldPositionY, this.state.LastWorldPositionZ);
-            ulong newAreaId = Locator.GetAreaIdFromWorldPosition(this.state.WorldPositionX, this.state.WorldPositionY, this.state.WorldPositionZ);
+            ulong oldAreaId = Locator.GetAreaIdFromWorldPosition(this.state.LastWorldPosition);
+            ulong newAreaId = Locator.GetAreaIdFromWorldPosition(this.state.WorldPosition);
             if (oldAreaId != newAreaId)
             {
                 this.shardRegionArea.Tell(new AreaCommandEnvelope(oldAreaId, new ObjectCommandEnvelope(objCmd.SenderId, objCmd.Command, objCmd.ToObjectId)));
@@ -373,7 +357,7 @@ namespace Abune.Server.Actor
 
         private void NotifyNewSubscriber(IActorRef subscriber)
         {
-            var createCommand = new ObjectCreateCommand(0, this.state.ObjectId, this.state.ParentObjectId, this.state.OwnerId, this.state.TypeId, this.state.WorldPositionX, this.state.WorldPositionY, this.state.WorldPositionZ, this.state.QuaternionW, this.state.QuaternionX, this.state.QuaternionY, this.state.QuaternionZ);
+            var createCommand = new ObjectCreateCommand(0, this.state.ObjectId, this.state.ParentObjectId, this.state.OwnerId, this.state.TypeId, this.state.WorldPosition, this.state.WorldOrientation);
             subscriber.Tell(this.CreateEnvelope(createCommand));
             if (this.state.LockOwnerId != LOCKNOOWNER)
             {
@@ -397,19 +381,10 @@ namespace Abune.Server.Actor
         private ObjectUpdatePositionCommand CreateObjectUpdatePositionCommand()
         {
             return new ObjectUpdatePositionCommand(
-                this.state.WorldPositionX,
-                this.state.WorldPositionY,
-                this.state.WorldPositionZ,
-                this.state.QuaternionW,
-                this.state.QuaternionX,
-                this.state.QuaternionY,
-                this.state.QuaternionZ,
-                this.state.VelocityX,
-                this.state.VelocityY,
-                this.state.VelocityZ,
-                this.state.AngularVelocityX,
-                this.state.AngularVelocityY,
-                this.state.AngularVelocityZ,
+                this.state.WorldPosition,
+                this.state.WorldOrientation,
+                this.state.Velocity,
+                this.state.AngularVelocity,
                 (ulong)DateTime.UtcNow.Ticks,
                 (ulong)DateTime.UtcNow.Ticks);
         }

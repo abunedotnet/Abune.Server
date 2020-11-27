@@ -1,6 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Abune.Shared.Util;
+using Abune.Shared.DataType;
 
 namespace Abune.Server.Tests
 {
@@ -20,7 +21,13 @@ namespace Abune.Server.Tests
         [TestCase(0.0f,      0.0f, -200.0f, 5000000500000049999)]
         public void GetAreaIdFromWorldPositionTest(float x, float y, float z, long expectedArea)
         {
-            ulong actual = Locator.GetAreaIdFromWorldPosition(x, y, z);
+            AVector3 wp = new AVector3
+            {
+                X = x,
+                Y = y,
+                Z = z,
+            };
+            ulong actual = Locator.GetAreaIdFromWorldPosition(wp);
             Assert.AreEqual(expectedArea, actual);
         }
 
@@ -30,7 +37,19 @@ namespace Abune.Server.Tests
         [TestCase(0.0f, 0.0f, 0.0f, 200.0f, 200.0f, 200.0f, 8)]
         public void GetAreaIdsWithinWorldBoundariesTest(float minX, float minY, float minZ, float maxX, float maxY, float maxZ, int expectedAreaCount)
         {
-            var actual = Locator.GetAreaIdsWithinWorldBoundaries(minX, minY, minZ, maxX, maxY, maxZ);
+            AVector3 min = new AVector3
+            {
+                X = minX,
+                Y = minY,
+                Z = minZ,
+            };
+            AVector3 max = new AVector3
+            {
+                X = maxX,
+                Y = maxY,
+                Z = maxZ,
+            };
+            var actual = Locator.GetAreaIdsWithinWorldBoundaries(min, max);
             Assert.AreEqual(expectedAreaCount, actual.Count);
         }
 

@@ -9,6 +9,7 @@ namespace Abune.Server.Actor.State
     using System;
     using System.Collections.Generic;
     using Abune.Shared.Command.Contract;
+    using Abune.Shared.DataType;
 
     /// <summary>Object actor state.</summary>
     public class ObjectState : ICanLocate
@@ -39,69 +40,25 @@ namespace Abune.Server.Actor.State
         /// <value>The lock owner identifier.</value>
         public uint LockOwnerId { get; set; }
 
-        /// <summary>Gets or sets the world position x.</summary>
-        /// <value>The world position x.</value>
-        public float WorldPositionX { get; set; }
+        /// <summary>Gets or sets the world position.</summary>
+        /// <value>The world position.</value>
+        public AVector3 WorldPosition { get; set; }
 
-        /// <summary>Gets or sets the world position y.</summary>
-        /// <value>The world position y.</value>
-        public float WorldPositionY { get; set; }
+        /// <summary>Gets or sets the last world position.</summary>
+        /// <value>The last world position.</value>
+        public AVector3 LastWorldPosition { get; set; }
 
-        /// <summary>Gets or sets the world position z.</summary>
-        /// <value>The world position z.</value>
-        public float WorldPositionZ { get; set; }
+        /// <summary>Gets or sets the orientation.</summary>
+        /// <value>The orientation.</value>
+        public AQuaternion WorldOrientation { get; set; }
 
-        /// <summary>Gets or sets the last world position x.</summary>
-        /// <value>The last world position x.</value>
-        public float LastWorldPositionX { get; set; }
+        /// <summary>Gets or sets the velocity.</summary>
+        /// <value>The velocity.</value>
+        public AVector3 Velocity { get; set; }
 
-        /// <summary>Gets or sets the last world position y.</summary>
-        /// <value>The last world position y.</value>
-        public float LastWorldPositionY { get; set; }
-
-        /// <summary>Gets or sets the last world position z.</summary>
-        /// <value>The last world position z.</value>
-        public float LastWorldPositionZ { get; set; }
-
-        /// <summary>Gets or sets the quaternion w.</summary>
-        /// <value>The quaternion w.</value>
-        public float QuaternionW { get; set; }
-
-        /// <summary>Gets or sets the quaternion x.</summary>
-        /// <value>The quaternion x.</value>
-        public float QuaternionX { get; set; }
-
-        /// <summary>Gets or sets the quaternion y.</summary>
-        /// <value>The quaternion y.</value>
-        public float QuaternionY { get; set; }
-
-        /// <summary>Gets or sets the quaternion z.</summary>
-        /// <value>The quaternion z.</value>
-        public float QuaternionZ { get; set; }
-
-        /// <summary>Gets or sets the velocity x.</summary>
-        /// <value>The velocity x.</value>
-        public float VelocityX { get; set; }
-
-        /// <summary>Gets or sets the velocity y.</summary>
-        /// <value>The velocity y.</value>
-        public float VelocityY { get; set; }
-
-        /// <summary>Gets or sets the velocity z.</summary>
-        /// <value>The velocity z.</value>
-        public float VelocityZ { get; set; }
-
-        /// <summary>Gets or sets the angular velocity x.</summary>
-        /// <value>The angular velocity x.</value>
-        public float AngularVelocityX { get; set; }
-
-        /// <summary>Gets or sets the angular velocity y.</summary>
-        /// <value>The angular velocity y.</value>
-        public float AngularVelocityY { get; set; }
-
-        /// <summary>Gets or sets the angular velocity z.</summary>
-        /// <value>The angular velocity z.</value>
-        public float AngularVelocityZ { get; set; }
+        /// <summary>Gets or sets the angular velocity.</summary>
+        /// <value>The angular velocity.</value>
+        public AVector3 AngularVelocity { get; set; }
 
         /// <summary>Gets or sets the time stamp last command.</summary>
         /// <value>The time stamp last command.</value>
