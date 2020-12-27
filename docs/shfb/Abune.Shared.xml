@@ -152,6 +152,29 @@
             Deletes an object value.
             </summary>
         </member>
+        <member name="F:Abune.Shared.Command.CommandType.EventPoint">
+            <summary>
+            Event at a point.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandType.EventLine">
+            <summary>
+            Event with start and end.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Command.Contract.IAreaCommand">
+            <summary>
+            Interface for area commands.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.IAreaCommand.AreaId">
+            <summary>
+            Gets the area identifier.
+            </summary>
+            <value>
+            The area identifier.
+            </value>
+        </member>
         <member name="T:Abune.Shared.Command.Contract.ICanAccelerate">
             <summary>
             Interface for things that could accelerate.
@@ -183,6 +206,110 @@
         <member name="P:Abune.Shared.Command.Contract.ICanRotate.Orientation">
             <summary>Gets the orientation.</summary>
             <value>The orientation.</value>
+        </member>
+        <member name="T:Abune.Shared.Command.Contract.IObjectCommand">
+            <summary>
+            Interface for object commands.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.Contract.IObjectCommand.ObjectId">
+            <summary>
+            Gets the object identifier.
+            </summary>
+            <value>
+            The object identifier.
+            </value>
+        </member>
+        <member name="T:Abune.Shared.Command.EventLineCommand">
+            <summary>Linear event command.</summary>
+            <remarks>F.e. used for shooting events.</remarks>
+        </member>
+        <member name="M:Abune.Shared.Command.EventLineCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.EventLineCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.EventLineCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.EventLineCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.EventLineCommand.#ctor(System.UInt16,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3,System.UInt64,System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.EventLineCommand" /> class.</summary>
+            <param name="eventType">The event type.</param>
+            <param name="startPosition">The start position.</param>
+            <param name="endPosition">The end position.</param>
+            <param name="frameTick">The frame tick.</param>
+            <param name="data">The data.</param>
+            <exception cref="T:System.ArgumentNullException">Data is null.</exception>
+        </member>
+        <member name="P:Abune.Shared.Command.EventLineCommand.EventType">
+            <summary>Gets or sets the event type.</summary>
+            <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.EventLineCommand.FrameTick">
+            <summary>Gets or sets the frame tick.</summary>
+            <value>The frame tick when the event occured/will occur.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.EventLineCommand.StartPosition">
+            <summary>
+            Gets or sets position where the event starts.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.EventLineCommand.EndPosition">
+            <summary>
+            Gets or sets position where the event ends.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.EventLineCommand.Data">
+            <summary>Gets or sets the data.</summary>
+            <value>The data.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.EventLineCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPosition">
+            <summary>
+            Gets position where object is located.
+            </summary>
+        </member>
+        <member name="T:Abune.Shared.Command.EventPointCommand">
+            <summary>Update value of object command.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.EventPointCommand.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.EventPointCommand" /> class.</summary>
+        </member>
+        <member name="M:Abune.Shared.Command.EventPointCommand.#ctor(Abune.Shared.Command.BaseCommand)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.EventPointCommand" /> class.</summary>
+            <param name="command">The command.</param>
+            <exception cref="T:System.ArgumentNullException">Command is null.</exception>
+            <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
+        </member>
+        <member name="M:Abune.Shared.Command.EventPointCommand.#ctor(System.UInt16,Abune.Shared.DataType.AVector3,System.UInt64,System.Byte[])">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.EventPointCommand" /> class.</summary>
+            <param name="eventType">The event type.</param>
+            <param name="targetPosition">The target position.</param>
+            <param name="frameTick">The frame tick.</param>
+            <param name="data">The data.</param>
+            <exception cref="T:System.ArgumentNullException">Data is null.</exception>
+        </member>
+        <member name="P:Abune.Shared.Command.EventPointCommand.EventType">
+            <summary>Gets or sets the event type.</summary>
+            <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.EventPointCommand.FrameTick">
+            <summary>Gets or sets the frame tick.</summary>
+            <value>The frame tick when the event occured/will occur.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.EventPointCommand.TargetPosition">
+            <summary>
+            Gets or sets position where object is located.
+            </summary>
+        </member>
+        <member name="P:Abune.Shared.Command.EventPointCommand.Data">
+            <summary>Gets or sets the data.</summary>
+            <value>The data.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.EventPointCommand.Abune#Shared#Command#Contract#ICanLocate#WorldPosition">
+            <summary>
+            Gets position where object is located.
+            </summary>
         </member>
         <member name="T:Abune.Shared.Command.ObjectCreateCommand">
             <summary>
@@ -361,21 +488,27 @@
             <exception cref="T:System.ArgumentNullException">Command is null.</exception>
             <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
         </member>
-        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AQuaternion,System.UInt64,System.UInt64)">
+        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(System.UInt64,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AQuaternion,System.UInt64,System.UInt64)">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUpdatePositionCommand" /> class.</summary>
+            <param name="objectId">The object identifier.</param>
             <param name="targetPosition">The target position x.</param>
             <param name="targetOrientation">The quaternion .</param>
             <param name="startFrameTick">The start frame tick.</param>
             <param name="stopFrameTick">The stop frame tick.</param>
         </member>
-        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AQuaternion,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3,System.UInt64,System.UInt64)">
+        <member name="M:Abune.Shared.Command.ObjectUpdatePositionCommand.#ctor(System.UInt64,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AQuaternion,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3,System.UInt64,System.UInt64)">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectUpdatePositionCommand" /> class.</summary>
+            <param name="objectId">The object identifier.</param>
             <param name="targetPosition">The target position.</param>
             <param name="targetOrientation">The quaternion.</param>
             <param name="velocity">The velocity.</param>
             <param name="angularVelocity">The angular velocity.</param>
             <param name="startFrameTick">The start frame tick.</param>
             <param name="stopFrameTick">The stop frame tick.</param>
+        </member>
+        <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.ObjectId">
+            <summary>Gets or sets the object identifier.</summary>
+            <value>The object identifier.</value>
         </member>
         <member name="P:Abune.Shared.Command.ObjectUpdatePositionCommand.TargetPosition">
             <summary>Gets or sets the target position.</summary>
@@ -1166,8 +1299,8 @@
         </member>
         <member name="M:Abune.Shared.Util.Locator.GetAreaIdsWithinWorldBoundaries(Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3)">
             <summary>Gets all area identifiers within the given world boundaries.</summary>
-            <param name="min">The minimum world position.</param>
-            <param name="max">The maximum world  position.</param>
+            <param name="a">The world position start.</param>
+            <param name="b">The world position end.</param>
             <returns>List of area identifiers.</returns>
         </member>
         <member name="M:Abune.Shared.Util.Locator.GetAreaBoundary(System.UInt64,System.Single@,System.Single@,System.Single@,System.Single@,System.Single@,System.Single@)">

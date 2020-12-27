@@ -381,6 +381,7 @@ namespace Abune.Server.Actor
         private ObjectUpdatePositionCommand CreateObjectUpdatePositionCommand()
         {
             return new ObjectUpdatePositionCommand(
+                this.state.ObjectId,
                 this.state.WorldPosition,
                 this.state.WorldOrientation,
                 this.state.Velocity,
