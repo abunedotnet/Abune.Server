@@ -7,12 +7,15 @@
 namespace Abune.Server.Actor
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Text;
     using Abune.Server.Actor.Command;
     using Abune.Server.Actor.State;
     using Abune.Server.Sharding;
     using Abune.Shared.Command;
+    using Abune.Shared.Command.Contract;
     using Abune.Shared.Message;
     using Abune.Shared.Protocol;
     using Abune.Shared.Util;
@@ -53,7 +56,7 @@ namespace Abune.Server.Actor
             this.state.Endpoint = endpoint;
             this.shardRegionObject = shardRegionObject;
             this.shardRegionArea = shardRegionArea;
-            this.reliableClientMessaging.OnProcessCommandMessage = this.ProcessCommandMessage;
+            this.reliableClientMessaging.OnProcessCommandMessage = this.ProcessRequestFromClient;
             this.reliableClientMessaging.OnSendFrame = this.SendFrameToClient;
             this.reliableClientMessaging.OnDeadLetter = this.OnDeadLetter;
             this.Stash = new BoundedStashImpl(Context);
@@ -131,7 +134,12 @@ namespace Abune.Server.Actor
             });
             this.Receive<ObjectCommandRequestEnvelope>(c =>
             {
-                this.ProcessCommandMessage(c.Message);
+                this.ProcessRequestFromClient(c.Message);
+                this.SynchronizeMessages();
+            });
+            this.Receive<ObjectCommandResponseEnvelope>(c =>
+            {
+                this.ProcessResponseToClient(c);
                 this.SynchronizeMessages();
             });
             this.Receive<ReceiveTimeout>(r =>
@@ -139,13 +147,6 @@ namespace Abune.Server.Actor
                 this.SynchronizeMessages();
                 this.OnKeepAlive();
                 this.SetReceiveTimeout(this.keepAliveInterval);
-            });
-            this.Receive<ObjectCommandResponseEnvelope>(c =>
-            {
-                this.log.Debug($"[Server => Client:{this.state.ClientId}] type: {c.Message.Command.Type}");
-                var controlFlag = GetControlFlags(c);
-                this.reliableClientMessaging.SendCommand(c.Message.SenderId, c.Message.Command, c.Message.ToObjectId, controlFlag);
-                this.SynchronizeMessages();
             });
             this.Receive<CommandFailed>(c =>
             {
@@ -226,7 +227,7 @@ namespace Abune.Server.Actor
             }
         }
 
-        private void ProcessCommandMessage(ObjectCommandEnvelope cmdMsg)
+        private void ProcessRequestFromClient(ObjectCommandEnvelope cmdMsg)
         {
             try
             {
@@ -234,49 +235,37 @@ namespace Abune.Server.Actor
                 switch (cmdMsg.Command.Type)
                 {
                     case CommandType.SubscribeArea:
-                        var cmdSubscribeArea = new SubscribeAreaCommand(cmdMsg.Command);
-                        parsedCommand = cmdSubscribeArea;
-                        this.shardRegionArea.Tell(new AreaCommandEnvelope(cmdSubscribeArea.AreaId, new ObjectCommandEnvelope(0, cmdSubscribeArea, 0)));
+                        parsedCommand = this.TellArea(cmdMsg, _ => new SubscribeAreaCommand(_));
                         break;
                     case CommandType.UnsubscribeArea:
-                        var cmdUnsubscribeArea = new UnsubscribeAreaCommand(cmdMsg.Command);
-                        parsedCommand = cmdUnsubscribeArea;
-                        this.shardRegionArea.Tell(new AreaCommandEnvelope(cmdUnsubscribeArea.AreaId, new ObjectCommandEnvelope(0, cmdUnsubscribeArea, 0)));
+                        parsedCommand = this.TellArea(cmdMsg, _ => new UnsubscribeAreaCommand(_));
                         break;
                     case CommandType.ObjectUpdatePosition:
-                        var cmdUpdatePosition = new ObjectUpdatePositionCommand(cmdMsg.Command);
-                        parsedCommand = cmdUpdatePosition;
-                        this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmdUpdatePosition, cmdMsg.ToObjectId));
+                        parsedCommand = this.TellObject(cmdMsg, _ => new ObjectUpdatePositionCommand(_));
                         break;
                     case CommandType.ObjectCreate:
-                        var cmdObjectCreate = new ObjectCreateCommand(cmdMsg.Command);
-                        parsedCommand = cmdObjectCreate;
-                        this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmdObjectCreate, cmdMsg.ToObjectId));
+                        parsedCommand = this.TellObject(cmdMsg, _ => new ObjectCreateCommand(_));
                         break;
                     case CommandType.ObjectDestroy:
-                        var cmdObjectDestroy = new ObjectDestroyCommand(cmdMsg.Command);
-                        parsedCommand = cmdObjectDestroy;
-                        this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmdObjectDestroy, cmdMsg.ToObjectId));
+                        parsedCommand = this.TellObject(cmdMsg, _ => new ObjectDestroyCommand(_));
                         break;
                     case CommandType.ObjectLock:
-                        var cmdLockObject = new ObjectLockCommand(cmdMsg.Command);
-                        parsedCommand = cmdLockObject;
-                        this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmdLockObject, cmdMsg.ToObjectId));
+                        parsedCommand = this.TellObject(cmdMsg, _ => new ObjectLockCommand(_));
                         break;
                     case CommandType.ObjectUnlock:
-                        var cmdUnlockObject = new ObjectUnlockCommand(cmdMsg.Command);
-                        parsedCommand = cmdUnlockObject;
-                        this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmdUnlockObject, cmdMsg.ToObjectId));
+                        parsedCommand = this.TellObject(cmdMsg, _ => new ObjectUnlockCommand(_));
                         break;
                     case CommandType.ObjectValueUpdate:
-                        var cmdObjectValueUpdate = new ObjectValueUpdateCommand(cmdMsg.Command);
-                        parsedCommand = cmdObjectValueUpdate;
-                        this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmdObjectValueUpdate, cmdMsg.ToObjectId));
+                        parsedCommand = this.TellObject(cmdMsg, _ => new ObjectValueUpdateCommand(_));
                         break;
                     case CommandType.ObjectValueRemove:
-                        var cmdObjectValueRemove = new ObjectValueRemoveCommand(cmdMsg.Command);
-                        parsedCommand = cmdObjectValueRemove;
-                        this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmdObjectValueRemove, cmdMsg.ToObjectId));
+                        parsedCommand = this.TellObject(cmdMsg, _ => new ObjectValueRemoveCommand(_));
+                        break;
+                    case CommandType.EventPoint:
+                        parsedCommand = this.TellEvent(cmdMsg, _ => new EventPointCommand(_), _ => new[] { Locator.GetAreaIdFromWorldPosition(_.TargetPosition) });
+                        break;
+                    case CommandType.EventLine:
+                        parsedCommand = this.TellEvent(cmdMsg, _ => new EventLineCommand(_), _ => Locator.GetAreaIdsWithinWorldBoundaries(_.StartPosition, _.EndPosition));
                         break;
                 }
 
@@ -289,6 +278,47 @@ namespace Abune.Server.Actor
             {
                 this.Sender.Tell(new Failure() { Exception = e });
             }
+        }
+
+        private void ProcessResponseToClient(ObjectCommandResponseEnvelope c)
+        {
+            this.log.Debug($"[Server => Client:{this.state.ClientId}] type: {c.Message.Command.Type}");
+            var controlFlag = GetControlFlags(c);
+            this.reliableClientMessaging.SendCommand(c.Message.SenderId, c.Message.Command, c.Message.ToObjectId, controlFlag);
+        }
+
+        private T TellObject<T>(ObjectCommandEnvelope cmdMsg, Func<BaseCommand, T> createFunc)
+            where T : BaseCommand, IObjectCommand
+        {
+            T cmd = createFunc(cmdMsg.Command);
+            this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmd, cmdMsg.ToObjectId));
+            return cmd;
+        }
+
+        private T TellEvent<T>(ObjectCommandEnvelope cmdMsg, Func<BaseCommand, T> createFunc, Func<T, IEnumerable<ulong>> extractAreas)
+            where T : BaseCommand, ICanLocate
+        {
+            T cmd = createFunc(cmdMsg.Command);
+            var areas = extractAreas(cmd);
+            if (!areas.Any())
+            {
+                this.log.Warning($"[{this.Self.Path.Name}] no areas for event [{cmd.Type}]");
+            }
+
+            foreach (ulong areaId in areas)
+            {
+                this.shardRegionArea.Tell(new AreaCommandEnvelope(areaId, new ObjectCommandEnvelope(cmdMsg.SenderId, cmd, 0)));
+            }
+
+            return cmd;
+        }
+
+        private T TellArea<T>(ObjectCommandEnvelope cmdMsg, Func<BaseCommand, T> createFunc)
+            where T : BaseCommand, IAreaCommand
+        {
+            T cmd = createFunc(cmdMsg.Command);
+            this.shardRegionArea.Tell(new AreaCommandEnvelope(cmd.AreaId, new ObjectCommandEnvelope(0, cmd, 0)));
+            return cmd;
         }
 
         private void RespondState(IActorRef replyTo)

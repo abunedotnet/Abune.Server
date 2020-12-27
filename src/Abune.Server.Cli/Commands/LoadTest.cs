@@ -208,7 +208,7 @@ namespace Abune.Server.Cli.Commands
                     _testCountdownEventCreated.Signal();
                     _testCountdownEventCreated.Wait();
 
-                    statistics.MessageStatistic.Add("UPDATE", RunStatistics(client, qos, "Update positions", MessageCount, _ => new ObjectUpdatePositionCommand(location, AQuaternion.Zero, AVector3.Zero, AVector3.Zero, 0, 0)));
+                    statistics.MessageStatistic.Add("UPDATE", RunStatistics(client, qos, "Update positions", MessageCount, _ => new ObjectUpdatePositionCommand(_, location, AQuaternion.Zero, AVector3.Zero, AVector3.Zero, 0, 0)));
                     _testCountdownEventUpdate.Signal();
                     _testCountdownEventUpdate.Wait();
 

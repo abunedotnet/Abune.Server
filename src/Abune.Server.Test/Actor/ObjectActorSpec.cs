@@ -150,7 +150,8 @@
             float newPosY = 4000.0f;
             float newPosZ = 5000.0f;
 
-            var cmdUpdatePosition = new ObjectUpdatePositionCommand(                
+            var cmdUpdatePosition = new ObjectUpdatePositionCommand(
+                DEFAULTOBJECTID,
                 targetPosition: new AVector3
                 {
                     X = newPosX,
@@ -219,6 +220,7 @@
             var cmdEnvLock = new ObjectCommandEnvelope(LOCKOWNER, cmdLock, DEFAULTOBJECTID);
 
             var cmdUpdatePosition = new ObjectUpdatePositionCommand(
+                DEFAULTOBJECTID,
                 targetPosition: new AVector3
                 {
                     X = 10.0f,
@@ -269,6 +271,7 @@
             var cmdEnvLock = new ObjectCommandEnvelope(LOCKOWNER, cmdLock, DEFAULTOBJECTID);
 
             var cmdUpdatePosition = new ObjectUpdatePositionCommand(
+                DEFAULTOBJECTID,
                 targetPosition: new AVector3
                 {
                     X = 10.0f,

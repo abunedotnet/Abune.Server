@@ -8,6 +8,7 @@ namespace Abune.Server.Sharding
 {
     using System.Globalization;
     using Abune.Server.Command;
+    using Abune.Shared.Command.Contract;
     using Abune.Shared.Message;
     using Akka.Cluster.Sharding;
 
@@ -37,6 +38,10 @@ namespace Abune.Server.Sharding
             else if (message is ObjectLeaveAreaCommand)
             {
                 return (message as ObjectLeaveAreaCommand)?.AreaId.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (message is IAreaCommand)
+            {
+                return (message as IAreaCommand)?.AreaId.ToString(CultureInfo.InvariantCulture);
             }
 
             return string.Empty;
