@@ -1,0 +1,2 @@
+helm uninstall abune-server
+
