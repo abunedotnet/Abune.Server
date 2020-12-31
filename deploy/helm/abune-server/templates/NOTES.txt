@@ -1,0 +1,2 @@
+Your Abune-Server is deployed.
+Try to connect with your game client using UDP://LOADBALANCER-IP:{{ .Values.service.ports.server.internalPort }}
