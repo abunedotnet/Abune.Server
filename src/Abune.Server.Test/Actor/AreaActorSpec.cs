@@ -73,7 +73,7 @@ namespace Abune.Server.Test.Actor
             testeeRef.Tell(new AreaCommandEnvelope(DEFAULTAREAID, new ObjectCommandEnvelope(0, new SubscribeAreaCommand(DEFAULTCLIENTID, DEFAULTAREAID, 0), 0)), subscriberProbe);
             
             //execute
-            testeeRef.Tell(new AreaCommandEnvelope(DEFAULTAREAID, new ObjectCommandEnvelope(0, new EventLineCommand(0, AVector3.Zero, AVector3.Zero, 0UL, new byte[] {}), 0)));
+            testeeRef.Tell(new AreaCommandEnvelope(DEFAULTAREAID, new ObjectCommandEnvelope(0, new EventLineCommand(0 ,0, AVector3.Zero, AVector3.Zero, 0UL, new byte[] {}), 0)));
 
             //verify
             subscriberProbe.ExpectMsg<ObjectCommandResponseEnvelope>(m =>

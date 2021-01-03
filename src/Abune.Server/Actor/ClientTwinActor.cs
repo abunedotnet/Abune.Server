@@ -17,6 +17,7 @@ namespace Abune.Server.Actor
     using Abune.Shared.Command;
     using Abune.Shared.Command.Contract;
     using Abune.Shared.Message;
+    using Abune.Shared.Message.Contract;
     using Abune.Shared.Protocol;
     using Abune.Shared.Util;
     using Akka.Actor;
@@ -33,7 +34,7 @@ namespace Abune.Server.Actor
     {
         private readonly ILoggingAdapter log = Logging.GetLogger(Context);
         private readonly TimeSpan keepAliveInterval = TimeSpan.FromSeconds(10);
-        private readonly TimeSpan clientTimeout = TimeSpan.FromMinutes(5);
+        private readonly TimeSpan clientTimeout = TimeSpan.FromSeconds(20);
         private readonly ClientTwinState state = new ClientTwinState();
         private ReliableUdpMessaging reliableClientMessaging = new ReliableUdpMessaging();
         private IActorRef shardRegionArea;
@@ -291,7 +292,14 @@ namespace Abune.Server.Actor
             where T : BaseCommand, IObjectCommand
         {
             T cmd = createFunc(cmdMsg.Command);
-            this.shardRegionObject.Tell(new ObjectCommandEnvelope(cmdMsg.SenderId, cmd, cmdMsg.ToObjectId));
+            var commandEnvelope = new ObjectCommandEnvelope(cmdMsg.SenderId, cmd, cmdMsg.ToObjectId);
+            object message = commandEnvelope;
+            if ((cmd.Flags & CommandFlags.QuorumRequest) != 0)
+            {
+                message = new QuorumRequestEnvelope(commandEnvelope);
+            }
+
+            this.shardRegionObject.Tell(message);
             return cmd;
         }
 

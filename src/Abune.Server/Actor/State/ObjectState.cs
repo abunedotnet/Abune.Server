@@ -10,6 +10,7 @@ namespace Abune.Server.Actor.State
     using System.Collections.Generic;
     using Abune.Shared.Command.Contract;
     using Abune.Shared.DataType;
+    using Akka.Actor;
 
     /// <summary>Object actor state.</summary>
     public class ObjectState : ICanLocate
@@ -18,6 +19,7 @@ namespace Abune.Server.Actor.State
         public ObjectState()
         {
             this.ObjectStateValues = new Dictionary<uint, ObjectStateValue>();
+            this.ActiveQuorumVotesByHash = new Dictionary<ulong, IActorRef>();
         }
 
         /// <summary>Gets or sets the object identifier.</summary>
@@ -71,5 +73,13 @@ namespace Abune.Server.Actor.State
         /// <summary>Gets the object state values.</summary>
         /// <value>The object state values.</value>
         public Dictionary<uint, ObjectStateValue> ObjectStateValues { get; private set; }
+
+        /// <summary>
+        /// Gets the active quorum votes by hash.
+        /// </summary>
+        /// <value>
+        /// The active quorum votes by hash.
+        /// </value>
+        public Dictionary<ulong, IActorRef> ActiveQuorumVotesByHash { get; private set; }
     }
 }

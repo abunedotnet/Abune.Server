@@ -16,6 +16,7 @@ namespace Abune.Server.Actor
     using Abune.Server.Actor.State;
     using Abune.Server.Sharding;
     using Abune.Shared.Message;
+    using Abune.Shared.Message.Contract;
     using Abune.Shared.Protocol;
     using Akka.Actor;
     using Akka.Cluster.Sharding;

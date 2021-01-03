@@ -79,7 +79,19 @@ namespace Abune.Server.Actor
             {
                 this.ValidateResetLock();
             }
-            else if (message is ObjectCommandEnvelope)
+
+            if (message is QuorumRequestEnvelope)
+            {
+                var quorumEnvelope = message as QuorumRequestEnvelope;
+                this.ProcessQuorumRequest(quorumEnvelope);
+            }
+
+            if (message is Terminated)
+            {
+                this.RemoveQuorumActor((Terminated)message);
+            }
+
+            if (message is ObjectCommandEnvelope)
             {
                 var objCmd = (ObjectCommandEnvelope)message;
                 uint senderId = objCmd.SenderId;
@@ -128,7 +140,8 @@ namespace Abune.Server.Actor
 
                 return true;
             }
-            else if (message is NotifySubscribeObjectExistenceCommand)
+
+            if (message is NotifySubscribeObjectExistenceCommand)
             {
                 NotifySubscribeObjectExistenceCommand cmd = (NotifySubscribeObjectExistenceCommand)message;
                 this.NotifyNewSubscriber(cmd.Subscriber);
@@ -168,6 +181,16 @@ namespace Abune.Server.Actor
             }
 
             return true;
+        }
+
+        private static ulong GetQuorumHashFromActorPath(IActorRef actorRef)
+        {
+            return ulong.Parse(actorRef.Path.Elements[actorRef.Path.Elements.Count - 1], CultureInfo.InvariantCulture);
+        }
+
+        private static string GetQuorumActorNameFromHash(ulong quorumHash)
+        {
+            return quorumHash.ToString(CultureInfo.InvariantCulture);
         }
 
         private static bool IsLockProtectedCommand(CommandType commandType)
@@ -388,6 +411,40 @@ namespace Abune.Server.Actor
                 this.state.AngularVelocity,
                 (ulong)DateTime.UtcNow.Ticks,
                 (ulong)DateTime.UtcNow.Ticks);
+        }
+
+        private void ProcessQuorumRequest(QuorumRequestEnvelope quorumRequestEnvelope)
+        {
+            ulong quorumHash = quorumRequestEnvelope.CommandEnvelope.Command.QuorumHash;
+
+            if (this.state.ActiveQuorumVotesByHash.ContainsKey(quorumHash))
+            {
+                // quorum vote is active
+                this.state.ActiveQuorumVotesByHash[quorumHash].Tell(quorumRequestEnvelope.CommandEnvelope);
+                return;
+            }
+
+            if (quorumRequestEnvelope.VoterCount == QuorumRequestEnvelope.UNKNOWNVOTERCOUNT)
+            {
+                // we need to now the voter count to get a quorum.
+                quorumRequestEnvelope.VotingAreaId = Locator.GetAreaIdFromWorldPosition(this.state.WorldPosition);
+                this.log.Debug($"Requesting voter count for quorum '{quorumHash}' from area [{quorumRequestEnvelope.VotingAreaId}].");
+                this.shardRegionArea.Tell(quorumRequestEnvelope);
+                return;
+            }
+
+            // TODO: configure timeout
+            IActorRef quorumActor = Context.ActorOf(Props.Create<QuorumActor>(quorumHash, quorumRequestEnvelope.VoterCount, TimeSpan.FromSeconds(1)), GetQuorumActorNameFromHash(quorumHash));
+            Context.Watch(quorumActor);
+            this.state.ActiveQuorumVotesByHash.Add(quorumHash, quorumActor);
+            quorumActor.Tell(quorumRequestEnvelope.CommandEnvelope);
+        }
+
+        private void RemoveQuorumActor(Terminated terminated)
+        {
+            this.log.Debug($"Quorum actor terminated {terminated.ActorRef.Path}");
+            ulong quorumHash = GetQuorumHashFromActorPath(terminated.ActorRef);
+            this.state.ActiveQuorumVotesByHash.Remove(quorumHash);
         }
     }
 }

@@ -5,6 +5,7 @@
     using Abune.Server.Actor.Command;
     using Abune.Server.Test.TestKit;
     using Abune.Shared.Message;
+    using Abune.Shared.Message.Contract;
     using Abune.Shared.Protocol;
     using Akka.Actor;
     using Akka.IO;

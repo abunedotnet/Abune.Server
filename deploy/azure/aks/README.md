@@ -2,8 +2,9 @@
 
 ## Prerequisites
 
-- A) Create or use an existing **Azure Account** (https://azure.microsoft.com/en-us/free/)
-- B) Create or use an existing AKS/kubernetes **cluster** (https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal)
+- A) Create or use an existing **Azure Account** 
+https://azure.microsoft.com/en-us/free/
+- B) Create or use an existing AKS/kubernetes **cluster** https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal
 - C) Install the kubernetes managing tool "**kubectl**" (Windows: https://docs.microsoft.com/en-us/powershell/module/az.aks/install-azakskubectl, Linux: https://kubernetes.io/de/docs/tasks/tools/install-kubectl/)
 - D) Install the kubernetes package manager tool "**helm**" (https://helm.sh/docs/intro/install/)
 
