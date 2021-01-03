@@ -356,5 +356,50 @@
             areaRegionProbe.ExpectMsg<AreaCommandEnvelope>();
             return testeeRef;
         }
+
+        [Fact]
+        public void ActorMustRequestAreaToFillVoterCount()
+        {
+            //setup
+            var areaProbe = CreateTestProbe();
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(shardRegionResolver.Object)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
+            shardRegionResolver.Setup(m => m.GetShardRegion(ShardRegions.AREAREGION)).Returns(areaProbe);
+            ulong quorumHash = 12345U;
+            BaseCommand cmd = new ObjectValueUpdateCommand(objectId : 0, valueId : 0, new byte[] {}, CommandFlags.QuorumRequest, quorumHash: quorumHash );
+
+            //execute
+            testeeRef.Tell(new QuorumRequestEnvelope(new ObjectCommandEnvelope(0, cmd, DEFAULTOBJECTID)));
+            
+            //verify
+            areaProbe.ExpectMsg<QuorumRequestEnvelope>(m =>
+            {
+                Assert.Equal(QuorumRequestEnvelope.UNKNOWNVOTERCOUNT, m.VoterCount);
+                Assert.Equal(DEFAULTOBJECTID, m.CommandEnvelope.ToObjectId);
+            });
+        }
+        
+        [Fact]
+        public void ActorMustCheckQuorumActorWhenVoterCountIsKnown()
+        {
+            //setup
+            var areaProbe = CreateTestProbe();
+            var quorumRequesterProbe = CreateTestProbe();
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ObjectActor(shardRegionResolver.Object)), DEFAULTOBJECTID.ToString(CultureInfo.InvariantCulture));
+            ulong quorumHash = 12345U;
+            shardRegionResolver.Setup(m => m.GetShardRegion(ShardRegions.AREAREGION)).Returns(areaProbe);
+            const uint VOTERID1 = 1;
+            const uint VOTERID2 = 2;
+            BaseCommand cmd = new ObjectValueUpdateCommand(objectId: 0, valueId: 0, new byte[] {}, CommandFlags.QuorumRequest, quorumHash);
+            
+            //execute
+            testeeRef.Tell(new QuorumRequestEnvelope(new ObjectCommandEnvelope(VOTERID1, cmd, DEFAULTOBJECTID)) { VoterCount = 2 }, quorumRequesterProbe);
+            testeeRef.Tell(new QuorumRequestEnvelope(new ObjectCommandEnvelope(VOTERID2, cmd, DEFAULTOBJECTID)) { VoterCount = QuorumRequestEnvelope.UNKNOWNVOTERCOUNT }, quorumRequesterProbe);
+            
+            //verify
+            areaProbe.ExpectMsg<AreaCommandEnvelope>(m =>
+            {
+                Assert.Equal(CommandType.ObjectValueUpdate, m.ObjectCommandEnvelope.Command.Type);
+            }, TimeSpan.FromSeconds(5));
+        }
     }
 }

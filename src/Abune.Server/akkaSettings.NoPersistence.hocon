@@ -1,6 +1,6 @@
 ﻿akka {
-    stdout-loglevel = INFO
-    loglevel = INFO
+    stdout-loglevel = DEBUG
+    loglevel = DEBUG
     actor {
         provider = cluster
         default-dispatcher {

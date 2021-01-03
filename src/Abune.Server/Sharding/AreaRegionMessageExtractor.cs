@@ -10,6 +10,7 @@ namespace Abune.Server.Sharding
     using Abune.Server.Command;
     using Abune.Shared.Command.Contract;
     using Abune.Shared.Message;
+    using Abune.Shared.Message.Contract;
     using Akka.Cluster.Sharding;
 
     /// <summary>Message extractor for area shard regions.</summary>
@@ -42,6 +43,10 @@ namespace Abune.Server.Sharding
             else if (message is IAreaCommand)
             {
                 return (message as IAreaCommand)?.AreaId.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (message is ICanRouteToArea)
+            {
+                return (message as ICanRouteToArea)?.ToAreaId.ToString(CultureInfo.InvariantCulture);
             }
 
             return string.Empty;

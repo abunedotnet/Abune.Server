@@ -9,6 +9,7 @@ namespace Abune.Server.Sharding
     using System.Globalization;
     using Abune.Server.Actor.Command;
     using Abune.Shared.Message;
+    using Abune.Shared.Message.Contract;
     using Akka.Cluster.Sharding;
 
     /// <summary>Message extractor for object shard regions.</summary>
@@ -37,6 +38,10 @@ namespace Abune.Server.Sharding
             else if (message is NotifyUnsubscribeObjectExistenceCommand)
             {
                 return (message as NotifyUnsubscribeObjectExistenceCommand)?.ObjectId.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (message is ICanRouteToObject)
+            {
+                return (message as ICanRouteToObject)?.ToObjectId.ToString(CultureInfo.InvariantCulture);
             }
 
             return string.Empty;

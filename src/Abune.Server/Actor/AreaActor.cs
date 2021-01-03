@@ -89,9 +89,22 @@ namespace Abune.Server.Actor
                         break;
                 }
             }
-            else if (message is IInternalCommand)
+
+            if (message is QuorumRequestEnvelope)
+            {
+                var quorumEnvelope = (QuorumRequestEnvelope)message;
+                quorumEnvelope.VoterCount = this.state.Subscriptions.Count;
+                this.shardRegionObject.Forward(quorumEnvelope);
+            }
+
+            if (message is IInternalCommand)
             {
                 this.UpdateStatePersistent((IInternalCommand)message);
+            }
+
+            if (message is Terminated)
+            {
+                this.Unsubscribe(((Terminated)message).ActorRef);
             }
 
             return true;
@@ -172,6 +185,7 @@ namespace Abune.Server.Actor
             if (!this.state.Subscriptions.ContainsKey(subscriber))
             {
                 this.state.Subscriptions.Add(subscriber, new Subscription { SubscriberActorRef = subscriber, MessagePriority = messagePriority });
+                Context.Watch(subscriber);
             }
 
             foreach (ulong objectId in this.state.Objects.Keys)

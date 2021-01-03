@@ -21,19 +21,14 @@
             </summary>
             <param name="br">Binary reader on the buffer containing payload.</param>
         </member>
-        <member name="M:Abune.Shared.Command.BaseCommand.#ctor(Abune.Shared.Command.CommandType)">
+        <member name="M:Abune.Shared.Command.BaseCommand.#ctor(Abune.Shared.Command.CommandType,System.Byte,Abune.Shared.Command.CommandFlags,System.UInt64)">
             <summary>
             Initializes a new instance of the <see cref="T:Abune.Shared.Command.BaseCommand"/> class.
             </summary>
-            <param name="type">Type of command.</param>
-        </member>
-        <member name="M:Abune.Shared.Command.BaseCommand.#ctor(System.Byte,Abune.Shared.Command.CommandType,System.Byte[])">
-            <summary>
-            Initializes a new instance of the <see cref="T:Abune.Shared.Command.BaseCommand"/> class.
-            </summary>
-            <param name="priority">Command priority.</param>
-            <param name="type">Command type.</param>
-            <param name="commandBody">Body payload of command.</param>
+            <param name="type">The type of command.</param>
+            <param name="priority">The priority.</param>
+            <param name="flags">The flags.</param>
+            <param name="quorumHash">The quorum hash.</param>
         </member>
         <member name="P:Abune.Shared.Command.BaseCommand.Priority">
             <summary>
@@ -50,6 +45,22 @@
             Gets or sets the command payload.
             </summary>
         </member>
+        <member name="P:Abune.Shared.Command.BaseCommand.Flags">
+            <summary>
+            Gets the flags.
+            </summary>
+            <value>
+            The flags.
+            </value>
+        </member>
+        <member name="P:Abune.Shared.Command.BaseCommand.QuorumHash">
+            <summary>
+            Gets the quorum hash.
+            </summary>
+            <value>
+            The quorum hash.
+            </value>
+        </member>
         <member name="M:Abune.Shared.Command.BaseCommand.Serialize">
             <summary>
             Serializes this instance.
@@ -61,6 +72,12 @@
             Serializes this instance into a binary writer.
             </summary>
             <param name="bw">Binary write to serialize to.</param>
+        </member>
+        <member name="M:Abune.Shared.Command.BaseCommand.CopyFrom(Abune.Shared.Command.BaseCommand)">
+            <summary>
+            Copies properties from other command.
+            </summary>
+            <param name="command">The command.</param>
         </member>
         <member name="M:Abune.Shared.Command.BaseCommand.ReadVector3(System.IO.BinaryReader)">
             <summary>
@@ -101,6 +118,21 @@
             Deserializes the binary reader into this instance.
             </summary>
             <param name="br">Binary reader on byte buffer.</param>
+        </member>
+        <member name="T:Abune.Shared.Command.CommandFlags">
+            <summary>
+            Different command types.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandFlags.None">
+            <summary>
+            No flags.
+            </summary>
+        </member>
+        <member name="F:Abune.Shared.Command.CommandFlags.QuorumRequest">
+            <summary>
+            Requests a successful quorum to before updating.
+            </summary>
         </member>
         <member name="T:Abune.Shared.Command.CommandType">
             <summary>
@@ -233,9 +265,10 @@
             <exception cref="T:System.ArgumentNullException">Command is null.</exception>
             <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
         </member>
-        <member name="M:Abune.Shared.Command.EventLineCommand.#ctor(System.UInt16,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3,System.UInt64,System.Byte[])">
+        <member name="M:Abune.Shared.Command.EventLineCommand.#ctor(System.UInt16,System.UInt64,Abune.Shared.DataType.AVector3,Abune.Shared.DataType.AVector3,System.UInt64,System.Byte[])">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.EventLineCommand" /> class.</summary>
             <param name="eventType">The event type.</param>
+            <param name="eventId">The event id.</param>
             <param name="startPosition">The start position.</param>
             <param name="endPosition">The end position.</param>
             <param name="frameTick">The frame tick.</param>
@@ -245,6 +278,10 @@
         <member name="P:Abune.Shared.Command.EventLineCommand.EventType">
             <summary>Gets or sets the event type.</summary>
             <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.EventLineCommand.EventId">
+            <summary>Gets or sets the event id.</summary>
+            <value>The event id.</value>
         </member>
         <member name="P:Abune.Shared.Command.EventLineCommand.FrameTick">
             <summary>Gets or sets the frame tick.</summary>
@@ -281,9 +318,10 @@
             <exception cref="T:System.ArgumentNullException">Command is null.</exception>
             <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
         </member>
-        <member name="M:Abune.Shared.Command.EventPointCommand.#ctor(System.UInt16,Abune.Shared.DataType.AVector3,System.UInt64,System.Byte[])">
+        <member name="M:Abune.Shared.Command.EventPointCommand.#ctor(System.UInt16,System.UInt64,Abune.Shared.DataType.AVector3,System.UInt64,System.Byte[])">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.EventPointCommand" /> class.</summary>
             <param name="eventType">The event type.</param>
+            <param name="eventId">The event id.</param>
             <param name="targetPosition">The target position.</param>
             <param name="frameTick">The frame tick.</param>
             <param name="data">The data.</param>
@@ -292,6 +330,10 @@
         <member name="P:Abune.Shared.Command.EventPointCommand.EventType">
             <summary>Gets or sets the event type.</summary>
             <value>The object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Command.EventPointCommand.EventId">
+            <summary>Gets or sets the event id.</summary>
+            <value>The event id.</value>
         </member>
         <member name="P:Abune.Shared.Command.EventPointCommand.FrameTick">
             <summary>Gets or sets the frame tick.</summary>
@@ -584,11 +626,13 @@
             <exception cref="T:System.ArgumentNullException">Command is null.</exception>
             <exception cref="T:System.NotSupportedException">Type {command.Type} not supported.</exception>
         </member>
-        <member name="M:Abune.Shared.Command.ObjectValueUpdateCommand.#ctor(System.UInt64,System.UInt32,System.Byte[])">
+        <member name="M:Abune.Shared.Command.ObjectValueUpdateCommand.#ctor(System.UInt64,System.UInt32,System.Byte[],Abune.Shared.Command.CommandFlags,System.UInt64)">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Command.ObjectValueUpdateCommand" /> class.</summary>
             <param name="objectId">The object identifier.</param>
             <param name="valueId">The value identifier.</param>
             <param name="data">The data.</param>
+            <param name="commandFlags">The command flags.</param>
+            <param name="quorumHash">The quorum hash.</param>
             <exception cref="T:System.ArgumentNullException">Data is null.</exception>
         </member>
         <member name="P:Abune.Shared.Command.ObjectValueUpdateCommand.ObjectId">
@@ -944,51 +988,70 @@
             <summary>Serializes this instance.</summary>
             <returns>Byte serialized instance.</returns>
         </member>
-        <member name="T:Abune.Shared.Message.ICanRouteToArea">
+        <member name="T:Abune.Shared.Message.Contract.ICanQuorumVote">
+            <summary>Implementation can be reached by object id.</summary>
+        </member>
+        <member name="P:Abune.Shared.Message.Contract.ICanQuorumVote.QuorumHash">
+            <summary>
+            Gets the quorum hash.
+            </summary>
+            <value>
+            The quorum hash.
+            </value>
+        </member>
+        <member name="P:Abune.Shared.Message.Contract.ICanQuorumVote.QuorumVoterId">
+            <summary>
+            Gets the voter identifier.
+            </summary>
+            <value>
+            The voter identifier.
+            </value>
+        </member>
+        <member name="T:Abune.Shared.Message.Contract.ICanRouteToArea">
             <summary>Implementation can be reached by area id.</summary>
         </member>
-        <member name="P:Abune.Shared.Message.ICanRouteToArea.ToAreaId">
+        <member name="P:Abune.Shared.Message.Contract.ICanRouteToArea.ToAreaId">
             <summary>Gets the area identifier.</summary>
             <value>Area identifier.</value>
         </member>
-        <member name="T:Abune.Shared.Message.ICanRouteToObject">
+        <member name="T:Abune.Shared.Message.Contract.ICanRouteToObject">
             <summary>Implementation can be reached by object id.</summary>
         </member>
-        <member name="P:Abune.Shared.Message.ICanRouteToObject.ToObjectId">
+        <member name="P:Abune.Shared.Message.Contract.ICanRouteToObject.ToObjectId">
             <summary>Gets the object identifier.</summary>
             <value>Object identifier.</value>
         </member>
-        <member name="T:Abune.Shared.Message.FrameType">
+        <member name="T:Abune.Shared.Message.Contract.FrameType">
             <summary>Enumeration for frame types.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.Start">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.Start">
             <summary>First start frame.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.ClientHello">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.ClientHello">
             <summary>Client hello frame.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.ServerHello">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.ServerHello">
             <summary>Server hello frame.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.ServerAuthenticationRequest">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.ServerAuthenticationRequest">
             <summary>The server authentication request.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.ClientAuthenticationResponse">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.ClientAuthenticationResponse">
             <summary>The client authentication response.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.ClientPing">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.ClientPing">
             <summary>Client ping request.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.ServerPong">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.ServerPong">
             <summary>Server pong response.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.ServerPing">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.ServerPing">
             <summary>Server ping request.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.ClientPong">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.ClientPong">
             <summary>Client pong response.</summary>
         </member>
-        <member name="F:Abune.Shared.Message.FrameType.Message">
+        <member name="F:Abune.Shared.Message.Contract.FrameType.Message">
             <summary>Containing message with commands.</summary>
         </member>
         <member name="T:Abune.Shared.Message.ObjectCommandEnvelope">
@@ -1018,6 +1081,22 @@
         <member name="P:Abune.Shared.Message.ObjectCommandEnvelope.Command">
             <summary>Gets the command.</summary>
             <value>The command.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.ObjectCommandEnvelope.QuorumVoterId">
+            <summary>
+            Gets the voter identifier.
+            </summary>
+            <value>
+            The voter identifier.
+            </value>
+        </member>
+        <member name="P:Abune.Shared.Message.ObjectCommandEnvelope.QuorumHash">
+            <summary>
+            Gets the quorum hash.
+            </summary>
+            <value>
+            The quorum hash.
+            </value>
         </member>
         <member name="M:Abune.Shared.Message.ObjectCommandEnvelope.Serialize">
             <summary>Serializes this instance.</summary>
@@ -1050,6 +1129,44 @@
         <member name="P:Abune.Shared.Message.ObjectCommandResponseEnvelope.Message">
             <summary>Gets the message.</summary>
             <value>The message.</value>
+        </member>
+        <member name="T:Abune.Shared.Message.QuorumRequestEnvelope">
+            <summary>Transport envelope for object commands.</summary>
+        </member>
+        <member name="F:Abune.Shared.Message.QuorumRequestEnvelope.UNKNOWNVOTERCOUNT">
+            <summary>
+            The unknown voter count constant.
+            </summary>
+        </member>
+        <member name="M:Abune.Shared.Message.QuorumRequestEnvelope.#ctor(Abune.Shared.Message.ObjectCommandEnvelope)">
+            <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Message.QuorumRequestEnvelope" /> class.</summary>
+            <param name="commandEnvelope">The command envelope.</param>
+        </member>
+        <member name="P:Abune.Shared.Message.QuorumRequestEnvelope.ToAreaId">
+            <summary>Gets the area identifier.</summary>
+            <value>Area identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.QuorumRequestEnvelope.ToObjectId">
+            <summary>Gets the target object identifier.</summary>
+            <value>Object identifier.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.QuorumRequestEnvelope.VotingAreaId">
+            <summary>Gets or sets the area identifier where the vote happens.</summary>
+            <value>Area identifier of voting.</value>
+        </member>
+        <member name="P:Abune.Shared.Message.QuorumRequestEnvelope.VoterCount">
+            <summary>
+            Gets or sets the voter count.
+            </summary>
+            <value>
+            The voter count.
+            </value>
+        </member>
+        <member name="P:Abune.Shared.Message.QuorumRequestEnvelope.CommandEnvelope">
+            <summary>
+             Gets the object command envelope.
+            </summary>
+            <value>The object command envelope.</value>
         </member>
         <member name="T:Abune.Shared.Message.ServerAuthenticationRequest">
             <summary>Server authentication request.</summary>
@@ -1252,7 +1369,7 @@
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Protocol.UdpTransferFrame" /> class.</summary>
             <param name="buffer">The buffer.</param>
         </member>
-        <member name="M:Abune.Shared.Protocol.UdpTransferFrame.#ctor(Abune.Shared.Message.FrameType,System.Byte[])">
+        <member name="M:Abune.Shared.Protocol.UdpTransferFrame.#ctor(Abune.Shared.Message.Contract.FrameType,System.Byte[])">
             <summary>Initializes a new instance of the <see cref="T:Abune.Shared.Protocol.UdpTransferFrame" /> class.</summary>
             <param name="type">The type.</param>
             <param name="messageBuffer">The message buffer.</param>
