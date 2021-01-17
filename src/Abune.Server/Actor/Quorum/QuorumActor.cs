@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Abune.Server.Actor
+namespace Abune.Server.Actor.Quorum
 {
     using System;
     using System.Collections.Generic;

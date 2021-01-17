@@ -11,6 +11,7 @@ namespace Abune.Server
     using System.Threading;
     using System.Threading.Tasks;
     using Abune.Server.Actor;
+    using Abune.Server.Actor.Metrics;
     using Abune.Server.Config;
     using Abune.Shared.Message;
     using Akka.Actor;
@@ -69,7 +70,7 @@ namespace Abune.Server
 
         private void CreateServerActor()
         {
-            IActorRef serverActor = this.system.ActorOf(Props.Create(() => new ServerActor(this.config.Value.ShardCountArea, this.config.Value.ShardCountObject, this.config.Value.Auth0Issuer, this.config.Value.Auth0Audience, this.config.Value.SigningKey)), "Server");
+            IActorRef serverActor = this.system.ActorOf(Props.Create(() => new ServerActor(this.config.Value.ShardCountArea, this.config.Value.ShardCountObject, this.config.Value.ShardCountSession, this.config.Value.Auth0Issuer, this.config.Value.Auth0Audience, this.config.Value.SigningKey)), "Server");
             serverActor.Tell(new StartServerMessage(new IPEndPoint(IPAddress.Any, this.config.Value.ServerPort)));
         }
 

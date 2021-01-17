@@ -1,20 +1,19 @@
-﻿
-
+﻿//-----------------------------------------------------------------------
+// <copyright file="QuorumActorSpec.cs" company="Thomas Stollenwerk (motmot80)">
+// Copyright (c) Thomas Stollenwerk (motmot80). All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace Abune.Server.Test.Actor
 {
     using System;
     using Abune.Server.Actor;
-    using Abune.Server.Actor.Command;
-    using Abune.Server.Sharding;
+    using Abune.Server.Actor.Quorum;
     using Abune.Server.Test.TestKit;
     using Abune.Shared.Command;
-    using Abune.Shared.DataType;
-    using Abune.Shared.Message;
-    using Abune.Shared.Message.Contract;
+    using Abune.Shared.Command.Object;
+    using Abune.Shared.Message.Object;
     using Akka.Actor;
-    using Akka.Cluster.Sharding;
-    using Moq;
     using Xunit;
 
     public class QuorumActorSpec : AbuneSpec

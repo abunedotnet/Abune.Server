@@ -30,6 +30,14 @@ namespace Abune.Server.Actor.State
         public int ShardCountArea { get; set; }
 
         /// <summary>
+        /// Gets or sets the shard count for sessions.
+        /// </summary>
+        /// <value>
+        /// The shard count sessions.
+        /// </value>
+        public int ShardCountSession { get; set; }
+
+        /// <summary>
         /// Gets or sets the shard count for objects.
         /// </summary>
         /// <value>

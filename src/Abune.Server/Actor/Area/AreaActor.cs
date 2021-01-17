@@ -13,7 +13,10 @@ namespace Abune.Server.Actor
     using Abune.Server.Command;
     using Abune.Server.Sharding;
     using Abune.Shared.Command;
-    using Abune.Shared.Message;
+    using Abune.Shared.Command.Area;
+    using Abune.Shared.Message.Area;
+    using Abune.Shared.Message.Object;
+    using Abune.Shared.Message.Quorum;
     using Akka.Actor;
     using Akka.Cluster.Sharding;
     using Akka.Event;

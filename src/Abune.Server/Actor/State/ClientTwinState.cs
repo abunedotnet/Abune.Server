@@ -49,5 +49,13 @@ namespace Abune.Server.Actor.State
         /// The authentication challenge.
         /// </value>
         public string AuthenticationChallenge { get; set; }
+
+        /// <summary>
+        /// Gets or sets the active session.
+        /// </summary>
+        /// <value>
+        /// The active session.
+        /// </value>
+        public ulong ActiveSessionId { get; set; }
     }
 }

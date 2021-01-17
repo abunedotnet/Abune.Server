@@ -10,6 +10,7 @@ namespace Abune.Server.Sharding
     using Abune.Server.Actor.Command;
     using Abune.Shared.Message;
     using Abune.Shared.Message.Contract;
+    using Abune.Shared.Message.Object;
     using Akka.Cluster.Sharding;
 
     /// <summary>Message extractor for object shard regions.</summary>
@@ -22,26 +23,25 @@ namespace Abune.Server.Sharding
         {
         }
 
+        /// <summary>
+        /// Builds the entity identifier.
+        /// </summary>
+        /// <param name="sessionId">The session identifier.</param>
+        /// <param name="objectId">The object identifier.</param>
+        /// <returns>The entity id.</returns>
+        public static string BuildEntityId(ulong sessionId, ulong objectId)
+        {
+            return $"{sessionId}-{objectId}";
+        }
+
         /// <summary>Extracts the identifier of the entity.</summary>
         /// <param name="message">Message to process.</param>
         /// <returns>Entity identifier.</returns>
         public override string EntityId(object message)
         {
-            if (message is ObjectCommandEnvelope)
+            if (message is ICanRouteToObject canRouteToObject)
             {
-                return (message as ObjectCommandEnvelope)?.ToObjectId.ToString(CultureInfo.InvariantCulture);
-            }
-            else if (message is NotifySubscribeObjectExistenceCommand)
-            {
-                return (message as NotifySubscribeObjectExistenceCommand)?.ObjectId.ToString(CultureInfo.InvariantCulture);
-            }
-            else if (message is NotifyUnsubscribeObjectExistenceCommand)
-            {
-                return (message as NotifyUnsubscribeObjectExistenceCommand)?.ObjectId.ToString(CultureInfo.InvariantCulture);
-            }
-            else if (message is ICanRouteToObject)
-            {
-                return (message as ICanRouteToObject)?.ToObjectId.ToString(CultureInfo.InvariantCulture);
+                return BuildEntityId(canRouteToObject.ToSessionId, canRouteToObject.ToObjectId);
             }
 
             return string.Empty;

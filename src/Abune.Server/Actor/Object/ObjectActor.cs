@@ -4,20 +4,24 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Abune.Server.Actor
+#pragma warning disable CA1716 // invalid namespace names
+namespace Abune.Server.Actor.Object
 {
     using System;
     using System.Globalization;
     using Abune.Server.Actor.Command;
+    using Abune.Server.Actor.Quorum;
     using Abune.Server.Actor.State;
     using Abune.Server.Command;
     using Abune.Server.Sharding;
     using Abune.Shared.Command;
     using Abune.Shared.Command.Contract;
-    using Abune.Shared.Message;
+    using Abune.Shared.Command.Object;
+    using Abune.Shared.Message.Area;
+    using Abune.Shared.Message.Object;
+    using Abune.Shared.Message.Quorum;
     using Abune.Shared.Util;
     using Akka.Actor;
-    using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.Persistence;
     using Newtonsoft.Json;

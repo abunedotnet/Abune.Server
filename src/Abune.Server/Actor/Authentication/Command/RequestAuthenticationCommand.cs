@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Abune.Server.Actor.Command
+namespace Abune.Server.Actor.Authentication.Command
 {
     using Abune.Server.Actor.Events;
     using Akka.Actor;

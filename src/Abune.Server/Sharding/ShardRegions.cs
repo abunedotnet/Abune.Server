@@ -14,5 +14,8 @@ namespace Abune.Server.Sharding
 
         /// <summary>The shard region for areas.</summary>
         public const string AREAREGION = "area";
+
+        /// <summary>The shard region for sessions.</summary>
+        public const string SESSIONREGION = "session";
     }
 }

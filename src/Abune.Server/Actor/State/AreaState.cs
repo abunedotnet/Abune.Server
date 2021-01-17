@@ -13,13 +13,23 @@ namespace Abune.Server.Actor.State
     public class AreaState
     {
         /// <summary>Initializes a new instance of the <see cref="AreaState"/> class.</summary>
+        /// <param name="parentSessionId">Identifier of the parent session.</param>
         /// <param name="areaId">Identifier of the area.</param>
-        public AreaState(ulong areaId)
+        public AreaState(ulong parentSessionId, ulong areaId)
         {
+            this.ParentSessionId = parentSessionId;
             this.AreaId = areaId;
             this.Subscriptions = new Dictionary<IActorRef, Subscription>();
             this.Objects = new Dictionary<ulong, object>();
         }
+
+        /// <summary>
+        /// Gets the parent session id.
+        /// </summary>
+        /// <value>
+        /// The parent session id.
+        /// </value>
+        public ulong ParentSessionId { get; private set; }
 
         /// <summary>
         /// Gets the area identifier.

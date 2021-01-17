@@ -28,6 +28,10 @@ namespace Abune.Server.Config
         /// <value>The shard count area.</value>
         public int ShardCountArea { get; set; } = 10;
 
+        /// <summary>Gets or sets the shard count session.</summary>
+        /// <value>The shard count session.</value>
+        public int ShardCountSession { get; set; } = 10;
+
         /// <summary>Gets or sets the shard count object.</summary>
         /// <value>The shard count object.</value>
         public int ShardCountObject { get; set; } = 100;

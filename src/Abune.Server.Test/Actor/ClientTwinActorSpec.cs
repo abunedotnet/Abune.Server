@@ -1,11 +1,21 @@
-﻿namespace Abune.Server.Test.Actor
+﻿//-----------------------------------------------------------------------
+// <copyright file="ClientTwinActorSpec.cs" company="Thomas Stollenwerk (motmot80)">
+// Copyright (c) Thomas Stollenwerk (motmot80). All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace Abune.Server.Test.Actor
 {
     using System.Net;
     using Abune.Server.Actor;
     using Abune.Server.Actor.Command;
+    using Abune.Server.Actor.Authentication.Command;
+    using Abune.Server.Actor.ClientTwin;
     using Abune.Server.Test.TestKit;
-    using Abune.Shared.Message;
     using Abune.Shared.Message.Contract;
+    using Abune.Shared.Message.Client;
+    using Abune.Shared.Message.Server;
+    using Abune.Shared.Command.Session;
     using Abune.Shared.Protocol;
     using Akka.Actor;
     using Akka.IO;
@@ -18,6 +28,7 @@
         private readonly IActorRef defaultAuthenticationProbe;
         private readonly IActorRef defaultShardRegionArea;
         private readonly IActorRef defaultObjectRegionArea;
+        private readonly IActorRef defaultSessionManager;
 
         IPEndPoint defaultEndpoint = new IPEndPoint(0, 0);
 
@@ -27,13 +38,14 @@
             defaultAuthenticationProbe = CreateTestProbe();
             defaultShardRegionArea = CreateTestProbe();
             defaultObjectRegionArea = CreateTestProbe();
+            defaultSessionManager = CreateTestProbe();
         }
 
         [Fact]
         public void ActorMustStartAndStop()
         {
             //setup
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ClientTwinActor(defaultSocketProbe, defaultAuthenticationProbe, defaultEndpoint, defaultShardRegionArea, defaultObjectRegionArea)));
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ClientTwinActor(defaultSocketProbe, defaultAuthenticationProbe, defaultEndpoint, defaultShardRegionArea, defaultObjectRegionArea, defaultSessionManager)));
             Watch(testeeRef);
 
             //execute
@@ -48,7 +60,7 @@
         {
             //setup
             var replyToProbe = CreateTestProbe();
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ClientTwinActor(defaultSocketProbe, defaultAuthenticationProbe, defaultEndpoint, defaultShardRegionArea, defaultObjectRegionArea)));
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ClientTwinActor(defaultSocketProbe, defaultAuthenticationProbe, defaultEndpoint, defaultShardRegionArea, defaultObjectRegionArea, defaultSessionManager)));
 
             //execute
             testeeRef.Tell(new RequestStateCommand(replyToProbe));
@@ -66,7 +78,7 @@
             //setup
             var shardRegionObjectProbe = CreateTestProbe();
             var replyToProbe = CreateTestProbe();
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ClientTwinActor(defaultSocketProbe, defaultAuthenticationProbe, defaultEndpoint, shardRegionObjectProbe, defaultObjectRegionArea)));
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ClientTwinActor(defaultSocketProbe, defaultAuthenticationProbe, defaultEndpoint, shardRegionObjectProbe, defaultObjectRegionArea, defaultSessionManager)));
             var clientPingMessage = new ClientPingMessage();
 
             //execute
@@ -95,6 +107,27 @@
                 Assert.Equal(FrameType.ServerPong, msg.Type);
             });
         }
+        
+        [Fact]
+        public void ActorMustCreateSessionOnRequest()
+        {
+            //setup
+            var authenticationProbe = CreateTestProbe();
+            var clientSocketProbe = CreateTestProbe();
+            var testeeRef = CreateAuthenticatedActor(authenticationProbe, clientSocketProbe);
+            var createSessionCommand = new SessionCreateCommand();
+
+            //execute - authentication actor response
+            testeeRef.Tell(new UdpTransferFrame(FrameType.Message, createSessionCommand.Serialize()));
+
+            //verify
+            clientSocketProbe.ExpectMsg<Udp.Send>(s =>
+            {
+                var msg = new UdpTransferFrame(s.Payload.ToArray());
+                Assert.Equal(FrameType.ServerPong, msg.Type);
+            });
+        }
+
 
         private IActorRef CreateAuthenticatedActor(TestProbe authenticationProbe, TestProbe clientSocketProbe)
         {
@@ -103,7 +136,7 @@
             const string TOKEN = "TOKEN";
             string EXPECTEDRESPONSE = $"HELLO {CLIENTID}";
             
-            var testeeRef = Sys.ActorOf(Props.Create(() => new ClientTwinActor(clientSocketProbe, authenticationProbe, defaultEndpoint, defaultShardRegionArea, defaultObjectRegionArea)));
+            var testeeRef = Sys.ActorOf(Props.Create(() => new ClientTwinActor(clientSocketProbe, authenticationProbe, defaultEndpoint, defaultShardRegionArea, defaultObjectRegionArea, defaultSessionManager)));
             var clientHelloMessage = new ClientHelloMessage()
             {
                 Message = string.Empty,

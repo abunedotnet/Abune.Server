@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="AreaRegionMessageExtractor.cs" company="Thomas Stollenwerk (motmot80)">
+// <copyright file="SessionRegionMessageExtractor.cs" company="Thomas Stollenwerk (motmot80)">
 // Copyright (c) Thomas Stollenwerk (motmot80). All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
@@ -14,24 +14,13 @@ namespace Abune.Server.Sharding
     using Akka.Cluster.Sharding;
 
     /// <summary>Message extractor for area shard regions.</summary>
-    public sealed class AreaRegionMessageExtractor : HashCodeMessageExtractor
+    public sealed class SessionRegionMessageExtractor : HashCodeMessageExtractor
     {
-        /// <summary>Initializes a new instance of the <see cref="AreaRegionMessageExtractor"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="SessionRegionMessageExtractor"/> class.</summary>
         /// <param name="numberOfShards">The number of shards.</param>
-        public AreaRegionMessageExtractor(int numberOfShards)
+        public SessionRegionMessageExtractor(int numberOfShards)
             : base(numberOfShards)
         {
-        }
-
-        /// <summary>
-        /// Builds the entity identifier.
-        /// </summary>
-        /// <param name="sessionId">The session identifier.</param>
-        /// <param name="areaId">The area identifier.</param>
-        /// <returns>The entity id.</returns>
-        public static string BuildEntityId(ulong sessionId, ulong areaId)
-        {
-            return $"{sessionId}-{areaId}";
         }
 
         /// <summary>Extracts the identifier of the entity.</summary>
@@ -39,9 +28,25 @@ namespace Abune.Server.Sharding
         /// <returns>Entity identifier.</returns>
         public override string EntityId(object message)
         {
-            if (message is ICanRouteToArea canRouteToArea)
+            if (message is AreaCommandEnvelope)
             {
-                return BuildEntityId(canRouteToArea.ToSessionId, canRouteToArea.ToAreaId);
+                return (message as AreaCommandEnvelope)?.ToAreaId.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (message is ObjectEnterAreaCommand)
+            {
+                return (message as ObjectEnterAreaCommand)?.AreaId.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (message is ObjectLeaveAreaCommand)
+            {
+                return (message as ObjectLeaveAreaCommand)?.AreaId.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (message is IAreaCommand)
+            {
+                return (message as IAreaCommand)?.AreaId.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (message is ICanRouteToArea)
+            {
+                return (message as ICanRouteToArea)?.ToAreaId.ToString(CultureInfo.InvariantCulture);
             }
 
             return string.Empty;

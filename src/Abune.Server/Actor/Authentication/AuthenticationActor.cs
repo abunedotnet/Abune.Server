@@ -4,15 +4,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Abune.Server.Actor
+namespace Abune.Server.Actor.Authentication
 {
     using System;
-    using System.Collections.Generic;
     using System.IdentityModel.Tokens.Jwt;
-    using System.Security;
-    using System.Text;
-    using Abune.Server.Actor.Command;
-    using Abune.Shared.Command;
+    using Abune.Server.Actor.Authentication.Command;
     using Akka.Actor;
     using Akka.Event;
     using Microsoft.IdentityModel.Tokens;

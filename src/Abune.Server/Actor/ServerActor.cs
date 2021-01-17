@@ -7,59 +7,67 @@
 namespace Abune.Server.Actor
 {
     using System;
-    using System.Collections.Generic;
-    using System.Globalization;
     using System.Net;
-    using System.Security;
-    using Abune.Server.Actor;
+    using Abune.Server.Actor.Authentication;
+    using Abune.Server.Actor.ClientTwin;
     using Abune.Server.Actor.Command;
+    using Abune.Server.Actor.Object;
+    using Abune.Server.Actor.Session;
     using Abune.Server.Actor.State;
     using Abune.Server.Sharding;
+    using Abune.Shared.Command.Session;
     using Abune.Shared.Message;
+    using Abune.Shared.Message.Client;
     using Abune.Shared.Message.Contract;
     using Abune.Shared.Protocol;
     using Akka.Actor;
     using Akka.Cluster.Sharding;
+    using Akka.Cluster.Tools.Singleton;
     using Akka.Event;
     using Akka.IO;
     using Akka.Pattern;
+    using Akka.Remote;
     using Newtonsoft.Json;
     using static Akka.IO.Udp;
 
     /// <summary>Actor representing a server instance accepting incoming connections.</summary>
     public class ServerActor : ReceiveActor
     {
+        private const string SESSIONMANAGERNAME = "sessionmanager";
         private readonly ILoggingAdapter log = Logging.GetLogger(Context);
         private IActorRef shardRegionObject;
         private IActorRef shardRegionArea;
+        private IActorRef shardRegionSession;
         private IActorRef udpManagerActor;
         private IActorRef authenticationActor;
-        private ServerState state;
+        private IActorRef sessionManager;
         private IShardRegionResolver shardRegionResolver;
+        private ServerState state;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerActor"/> class.
         /// </summary>
         /// <param name="shardCountArea">The shard count area.</param>
         /// <param name="shardCountObject">The shard count object.</param>
+        /// <param name="shardCountSession">The shard count session.</param>
         /// <param name="auth0Issuer">The auth0 issuer.</param>
         /// <param name="auth0Audience">The auth0 audience.</param>
         /// <param name="signingKey">The signing key.</param>
-        public ServerActor(int shardCountArea, int shardCountObject, string auth0Issuer, string auth0Audience, string signingKey)
+        public ServerActor(int shardCountArea, int shardCountObject, int shardCountSession, string auth0Issuer, string auth0Audience, string signingKey)
         {
             this.state = new ServerState();
             this.state.ShardCountArea = shardCountArea;
             this.state.ShardCountObject = shardCountObject;
+            this.state.ShardCountSession = shardCountSession;
             this.state.Auth0Issuer = auth0Issuer;
             this.state.Auth0Audience = auth0Audience;
             this.state.SigningKey = signingKey;
             this.udpManagerActor = Udp.Instance.Apply(Context.System).Manager;
             this.authenticationActor = this.CreateAuthenticationActor();
             this.InitializeShardRegions(Context.System);
-            this.Receive<StartServerMessage>(c =>
+            this.Receive<StartServerMessage>(cmd =>
             {
-                this.log.Info($"Binding udp on {c.ServerEndpoint}");
-                this.udpManagerActor.Tell(new Udp.Bind(this.Self, c.ServerEndpoint), this.Self);
+                this.Start(cmd);
             });
             this.Receive<Terminated>(t =>
             {
@@ -110,6 +118,26 @@ namespace Abune.Server.Actor
             return $"ClientTwin-{ipEndPoint.Address}-{ipEndPoint.Port}";
         }
 
+        private void Start(StartServerMessage cmd)
+        {
+            this.log.Info($"Binding udp on {cmd.ServerEndpoint}");
+            this.udpManagerActor.Tell(new Udp.Bind(this.Self, cmd.ServerEndpoint), this.Self);
+            this.sessionManager = this.CreateSessionManagerSingleton();
+            this.sessionManager.Tell(new SessionCreateCommand(), this.Self);
+        }
+
+        private IActorRef CreateSessionManagerSingleton()
+        {
+            IActorRef sessionManagerSingleton = Context.System.ActorOf(
+                ClusterSingletonManager.Props(
+                    singletonProps: Props.Create<SessionManagerSingletonActor>(ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.SESSIONREGION)),
+                    terminationMessage: PoisonPill.Instance,
+                    settings: ClusterSingletonManagerSettings.Create(Context.System)),
+                name: SESSIONMANAGERNAME);
+            this.log.Info($"Session Manager created: {sessionManagerSingleton.Path}");
+            return sessionManagerSingleton;
+        }
+
         private IActorRef GetClientTwinActor(EndPoint endpoint)
         {
             string clientTwinActorName = GetClientTwinActorName(endpoint);
@@ -147,7 +175,7 @@ namespace Abune.Server.Actor
                     throw new InvalidOperationException($"invalid endpoint type {clientEndPoint.GetType()}");
                 }
 
-                IActorRef clientTwinActor = Context.System.ActorOf(Props.Create(() => new ClientTwinActor(socketActorRef, this.authenticationActor, clientReceiveEndPoint, ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.AREAREGION), ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION))), clientTwinActorName);
+                IActorRef clientTwinActor = Context.System.ActorOf(Props.Create(() => new ClientTwinActor(socketActorRef, this.authenticationActor, clientReceiveEndPoint, ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.AREAREGION), ClusterSharding.Get(Context.System).ShardRegion(ShardRegions.OBJECTREGION), this.sessionManager)), clientTwinActorName);
                 Context.Watch(clientTwinActor);
                 this.state.ClientTwinActors.Add(clientTwinActorName, clientTwinActor);
                 return clientTwinActor;
@@ -167,6 +195,7 @@ namespace Abune.Server.Actor
             this.shardRegionResolver = new DefaultShardRegionResolver(ClusterSharding.Get(system));
             this.shardRegionObject = ClusterSharding.Get(system).Start(typeName: ShardRegions.OBJECTREGION, entityProps: Props.Create(() => new ObjectActor(this.shardRegionResolver)), settings: ClusterShardingSettings.Create(system), messageExtractor: new ObjectRegionMessageExtractor(this.state.ShardCountObject));
             this.shardRegionArea = ClusterSharding.Get(system).Start(typeName: ShardRegions.AREAREGION, entityProps: Props.Create(() => new AreaActor(this.shardRegionResolver)), settings: ClusterShardingSettings.Create(system), messageExtractor: new AreaRegionMessageExtractor(this.state.ShardCountArea));
+            this.shardRegionSession = ClusterSharding.Get(system).Start(typeName: ShardRegions.SESSIONREGION, entityProps: Props.Create(() => new AreaActor(this.shardRegionResolver)), settings: ClusterShardingSettings.Create(system), messageExtractor: new AreaRegionMessageExtractor(this.state.ShardCountSession));
         }
 
         private void RespondState(IActorRef replyTo)

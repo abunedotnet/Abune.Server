@@ -11,9 +11,11 @@ namespace Abune.Server.Cli
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
-    using Abune.Shared.Command;
-    using Abune.Shared.Message;
+    using Abune.Shared.Command.Area;
+    using Abune.Shared.Message.Client;
     using Abune.Shared.Message.Contract;
+    using Abune.Shared.Message.Object;
+    using Abune.Shared.Message.Server;
     using Abune.Shared.Util;
     using Abune.Shared.Protocol;
     using Abune.Server.Cli.Util;

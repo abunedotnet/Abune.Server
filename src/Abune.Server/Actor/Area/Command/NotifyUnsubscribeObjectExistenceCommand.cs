@@ -6,12 +6,13 @@
 
 namespace Abune.Server.Actor.Command
 {
+    using Abune.Shared.Message.Contract;
     using Akka.Actor;
 
     /// <summary>
     /// Notification command.
     /// </summary>
-    public class NotifyUnsubscribeObjectExistenceCommand
+    public class NotifyUnsubscribeObjectExistenceCommand : ICanRouteToObject
     {
         /// <summary>Gets or sets the object identifier.</summary>
         /// <value>The object identifier.</value>
@@ -20,5 +21,9 @@ namespace Abune.Server.Actor.Command
         /// <summary>Gets or sets the subscriber.</summary>
         /// <value>The subscriber.</value>
         public IActorRef Subscriber { get; set; }
+
+        /// <summary>Gets the target object identifier.</summary>
+        /// <value>Object identifier.</value>
+        public ulong ToObjectId => this.ObjectId;
     }
 }

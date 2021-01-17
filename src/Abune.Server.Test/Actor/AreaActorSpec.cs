@@ -1,11 +1,20 @@
-﻿using Abune.Shared.Command;
-using Abune.Shared.DataType;
-using Abune.Shared.Message;
+﻿//-----------------------------------------------------------------------
+// <copyright file="AreaActorSpec.cs" company="Thomas Stollenwerk (motmot80)">
+// Copyright (c) Thomas Stollenwerk (motmot80). All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace Abune.Server.Test.Actor
 {
+    using Abune.Shared.Command;
+    using Abune.Shared.DataType;
+    using Abune.Shared.Message;
     using Abune.Server.Actor;
     using Abune.Server.Actor.Command;
+    using Abune.Shared.Command.Area;
+    using Abune.Shared.Command.Event;
+    using Abune.Shared.Message.Area;
+    using Abune.Shared.Message.Object;
     using Abune.Server.Sharding;
     using Abune.Server.Test.TestKit;
     using Akka.Actor;

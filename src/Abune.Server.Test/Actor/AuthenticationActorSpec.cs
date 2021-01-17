@@ -1,7 +1,15 @@
-﻿namespace Abune.Server.Test.Actor
+﻿//-----------------------------------------------------------------------
+// <copyright file="AuthenticationActorSpec.cs" company="Thomas Stollenwerk (motmot80)">
+// Copyright (c) Thomas Stollenwerk (motmot80). All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace Abune.Server.Test.Actor
 {
     using Abune.Server.Actor;
     using Abune.Server.Actor.Command;
+    using Abune.Server.Actor.Authentication;
+    using Abune.Server.Actor.Authentication.Command;
     using Abune.Server.Sharding;
     using Abune.Server.Test.TestKit;
     using Akka.Actor;

@@ -14,7 +14,8 @@ namespace Abune.Server.Cli.Commands
     using System.Threading;
     using System.Threading.Tasks;
     using Abune.Shared.Command;
-    using Abune.Shared.Message;
+    using Abune.Shared.Command.Object;
+    using Abune.Shared.Message.Object;
     using Abune.Shared.Protocol;
     using Abune.Shared.Util;
     using System.Globalization;

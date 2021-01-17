@@ -16,11 +16,19 @@ namespace Abune.Server.Actor.State
     public class ObjectState : ICanLocate
     {
         /// <summary>Initializes a new instance of the <see cref="ObjectState"/> class.</summary>
-        public ObjectState()
+        /// <param name="parentSessionId">The identifier of the parent session.</param>
+        /// <param name="objectId">The identifier of the object.</param>
+        public ObjectState(ulong parentSessionId, ulong objectId)
         {
+            this.ParentSessionId = parentSessionId;
+            this.ObjectId = objectId;
             this.ObjectStateValues = new Dictionary<uint, ObjectStateValue>();
             this.ActiveQuorumVotesByHash = new Dictionary<ulong, IActorRef>();
         }
+
+        /// <summary>Gets the parent session id.</summary>
+        /// <value>The parent session id.</value>
+        public ulong ParentSessionId { get; private set; }
 
         /// <summary>Gets or sets the object identifier.</summary>
         /// <value>The object identifier.</value>

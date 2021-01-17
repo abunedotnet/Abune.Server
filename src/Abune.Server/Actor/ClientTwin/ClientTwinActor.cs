@@ -4,25 +4,32 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Abune.Server.Actor
+namespace Abune.Server.Actor.ClientTwin
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using System.Text;
+    using Abune.Server.Actor.Authentication.Command;
     using Abune.Server.Actor.Command;
     using Abune.Server.Actor.State;
-    using Abune.Server.Sharding;
     using Abune.Shared.Command;
+    using Abune.Shared.Command.Area;
     using Abune.Shared.Command.Contract;
-    using Abune.Shared.Message;
+    using Abune.Shared.Command.Event;
+    using Abune.Shared.Command.Object;
+    using Abune.Shared.Command.Session;
+    using Abune.Shared.Message.Area;
+    using Abune.Shared.Message.Client;
     using Abune.Shared.Message.Contract;
+    using Abune.Shared.Message.Object;
+    using Abune.Shared.Message.Quorum;
+    using Abune.Shared.Message.Server;
     using Abune.Shared.Protocol;
     using Abune.Shared.Util;
     using Akka.Actor;
     using Akka.Actor.Internal;
-    using Akka.Cluster.Sharding;
     using Akka.Event;
     using Akka.IO;
     using Newtonsoft.Json;
@@ -41,6 +48,7 @@ namespace Abune.Server.Actor
         private IActorRef shardRegionObject;
         private IActorRef udpSenderActor;
         private IActorRef authenticationActor;
+        private IActorRef sessionManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientTwinActor"/> class.
@@ -50,13 +58,15 @@ namespace Abune.Server.Actor
         /// <param name="endpoint">The endpoint.</param>
         /// <param name="shardRegionArea">The shard region area.</param>
         /// <param name="shardRegionObject">The shard region object.</param>
-        public ClientTwinActor(IActorRef socketActorRef, IActorRef authenticationActorRef, IPEndPoint endpoint, IActorRef shardRegionArea, IActorRef shardRegionObject)
+        /// <param name="sessionManager">The session manager singleton.</param>
+        public ClientTwinActor(IActorRef socketActorRef, IActorRef authenticationActorRef, IPEndPoint endpoint, IActorRef shardRegionArea, IActorRef shardRegionObject, IActorRef sessionManager)
         {
             this.udpSenderActor = socketActorRef;
             this.authenticationActor = authenticationActorRef;
             this.state.Endpoint = endpoint;
             this.shardRegionObject = shardRegionObject;
             this.shardRegionArea = shardRegionArea;
+            this.sessionManager = sessionManager;
             this.reliableClientMessaging.OnProcessCommandMessage = this.ProcessRequestFromClient;
             this.reliableClientMessaging.OnSendFrame = this.SendFrameToClient;
             this.reliableClientMessaging.OnDeadLetter = this.OnDeadLetter;
@@ -268,6 +278,12 @@ namespace Abune.Server.Actor
                     case CommandType.EventLine:
                         parsedCommand = this.TellEvent(cmdMsg, _ => new EventLineCommand(_), _ => Locator.GetAreaIdsWithinWorldBoundaries(_.StartPosition, _.EndPosition));
                         break;
+                    case CommandType.SessionJoin:
+                        this.RequestCreateSession(new SessionCreateCommand(cmdMsg.Command));
+                        break;
+                    case CommandType.SessionDestroy:
+                        this.RequestCreateSession(new SessionCreateCommand(cmdMsg.Command));
+                        break;
                 }
 
                 string commandInfo = parsedCommand != null ? parsedCommand.ToString() : string.Empty;
@@ -402,6 +418,26 @@ namespace Abune.Server.Actor
                 Token = msg.AuthenticationToken,
                 AuthenticationChallenge = this.state.AuthenticationChallenge,
             });
+        }
+
+        private void RequestCreateSession(SessionCreateCommand cmd)
+        {
+            this.sessionManager.Tell(cmd, this.Self);
+        }
+
+        private void JoinSession(SessionJoinCommand cmd)
+        {
+            this.sessionManager.Tell(cmd, this.Self);
+        }
+
+        private void LeaseSession(SessionLeaveCommand cmd)
+        {
+            this.sessionManager.Tell(cmd, this.Self);
+        }
+
+        private void RequestDestroySession(SessionDestroyCommand cmd)
+        {
+            this.sessionManager.Tell(cmd, this.Self);
         }
 
         private class IPEndpointConverter : JsonConverter
