@@ -52,7 +52,7 @@ Add a new load balancing rule.
 - **Backend Pool**: f.e. choose default <aksOutboundBackendPool>
 - **Health Probe**: AkkaCluster (TCP:30778)
 - **Session Persistence**: Client IP
-- **Floating IP**: enabled
+- **Floating IP**: disabled
 - **SNAT**: Use outbound rules ... (recommended)
 
 #### Networking - Inbound firewall rules
