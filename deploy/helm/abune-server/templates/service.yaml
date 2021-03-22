@@ -6,6 +6,7 @@ metadata:
     {{- include "abune-server.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  sessionAffinity: ClientIP
   ports:
     - name: game-server
       port: {{ .Values.service.ports.server.internalPort }}
